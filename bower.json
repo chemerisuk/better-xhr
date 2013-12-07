@@ -1,0 +1,13 @@
+{
+  "name": "better-xhr",
+  "version": "0.1.0",
+  "main": [
+    "dist/better-xhr.js"
+  ],
+  "ignore": [
+    ".*",
+    "test",
+    "src"
+  ],
+  "devDependencies": { }
+}

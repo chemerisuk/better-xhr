@@ -1,0 +1,23 @@
+{
+  "name": "better-xhr",
+  "description": "Better abstraction for XMLHttpRequest",
+  "version": "0.1.0",
+  "author": "Maksim Chemerisuk",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chemerisuk/better-xhr"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt": "0.4.1",
+    "grunt-contrib-jshint": "0.5.4",
+    "grunt-contrib-watch": "0.4.3",
+    "grunt-karma": "0.7.1",
+    "karma-coverage": "0.1.0",
+    "grunt-github-publish": "~0.1.1",
+    "grunt-shell": "~0.6.0"
+  }
+}
