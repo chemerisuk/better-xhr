@@ -3,20 +3,20 @@ better-xhr [![Build Status](https://api.travis-ci.org/chemerisuk/better-xhr.png?
 > Better abstraction for XMLHttpRequest
 
 ## API
-There are 3 possible ways to create a XHR instance:
+There are 3 possible ways to create a XHR instance(s):
 
-* `XHR(type, url, data)` - simple form that is useful for most of cases, `data` argument is optional
-* `XHR(settings)` - more advanced configuration that allow to use all possible options
-* `XHR([type, url, data], config, ...)` - multi XHR instance
+* `XHR(method, url, data)` - simple form that is useful for most of cases, `data` argument is optional
+* `XHR(settings)` - more advanced configuration that allows to use all possible options
+* `XHR([method, url, data], settings1, ...)` - multi XHR instance
 
 ### Settings
-* **type** - type of ajax request (`"get"`, `"post"`, `"put"` etc.)
+* **method** - type of ajax request (`"get"`, `"post"`, `"put"` etc.)
 * **url** - target URL
 * **data** - data that should be sent in request body
-* **headers** - extra headers that should be added to request (could be a function that returns key/value bject)
+* **headers** - extra headers that should be added to request (could be a function that returns key/value object)
 * **timeout** - request timeout value in miliseconds
 * **withCredentials** - value of the `withCredentials` flag
-* **responseType** - value of the `responseType` property
+* **responseType** - value of the `responseType` property (`"text"`, `"arraybuffer"`, `"blob"`, or `"document"`)
 
 ### Methods
 Every XHR instance has `then` method that accepts parameters declared in the [Promises/A](http://wiki.commonjs.org/wiki/Promises/A) spec:
