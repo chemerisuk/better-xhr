@@ -2,29 +2,42 @@ better-xhr [![Build Status](https://api.travis-ci.org/chemerisuk/better-xhr.png?
 =========================
 > Better abstraction for XMLHttpRequest
 
-## Features
-_TODO_
+## API
+There are 3 possible ways to create a XHR instance:
 
-## Installing
-Use [bower](http://bower.io/) to download this extension with all required dependencies.
+* `XHR(type, url, data)` - simple form that is useful for most of cases, `data` argument is optional
+* `XHR(settings)` - more advanced configuration that allow to use all possible options
+* `XHR([type, url, data], config, ...)` - multi XHR instance
 
-    bower install better-xhr --save
+### Settings
+* **type** - type of ajax request (`"get"`, `"post"`, `"put"` etc.)
+* **url** - target URL
+* **data** - data that should be sent in request body
+* **headers** - extra headers that should be added to request (could be a function that returns key/value bject)
+* **timeout** - request timeout value in miliseconds
+* **withCredentials** - value of the `withCredentials` flag
+* **responseType** - value of the `responseType` property
 
-This will clone the latest version of the __better-xhr__ into the `bower_components` directory at the root of your project.
+### Methods
+Every XHR instance has `then` method that accepts parameters declared in the [Promises/A](http://wiki.commonjs.org/wiki/Promises/A) spec:
 
-Then append the following script on your page:
+    then(fulfilledHandler, errorHandler, progressHandler)
 
-```html
-<html>
-<head>
-    ...
-</head>
-<body>
-    ...
-    <script src="bower_components/better-xhr/dist/better-xhr.js"></script>
-</body>
-</html>
-```
+To break request(s) `abort` method could be used.
+
+### Global overrides
+The **XHR** function has static properties that could be used to define default values for appropriare settings. For instance:
+
+* `XHR.headers` - key/value map of request headers that should be added into each request
+* `XHR.timeout` - default timeout value in miliseconds
+* `XHR.withCredentials` - default value of withCredentials
+* etc.
+
+Additionally the function has extra properties to specify global callbacks:
+
+* `XHR.onload` - global callback that executes on every successfull request
+* `XHR.onerror` - global callback that executes on every errored request
+* `XHR.onprogress` - global callback that executes on every request that is in progress
 
 ## Browser support
 * Chrome
