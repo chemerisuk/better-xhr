@@ -5,6 +5,11 @@ module.exports = function(config) {
         basePath: "..",
         frameworks: ["jasmine"],
         browsers: ["PhantomJS"],
+        preprocessors: { "src/better-xhr.js": "coverage" },
+        coverageReporter: {
+            type: "html",
+            dir: "coverage/"
+        },
         files: [
             "src/*.js",
             "test/spec/*.spec.js"

@@ -7,7 +7,12 @@
   "ignore": [
     ".*",
     "test",
-    "src"
+    "src",
+    "index.html",
+    "Gruntfile.js",
+    "package.json",
+    "bower.json",
+    "main.sublime-project"
   ],
   "devDependencies": { }
 }
