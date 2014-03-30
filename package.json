@@ -19,10 +19,12 @@
     "karma-phantomjs-launcher": "^0.1",
     "grunt-github-publish": "~0.1.1",
     "grunt-shell": "~0.6.0",
-    "coveralls": "^2.8.0"
+    "coveralls": "^2.8.0",
+    "jasmine-ajax": "git://github.com/pivotal/jasmine-ajax"
   },
   "scripts": {
     "test": "grunt test",
+    "dev": "grunt dev",
     "coveralls": "cat ./coverage/PhantomJS*/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   }
 }

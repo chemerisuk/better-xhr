@@ -11,6 +11,7 @@ module.exports = function(config) {
             dir: "coverage/"
         },
         files: [
+            "node_modules/jasmine-ajax/lib/mock-ajax.js",
             "src/*.js",
             "test/spec/*.spec.js"
         ]

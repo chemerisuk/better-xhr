@@ -18,6 +18,7 @@
     "lastsemic": true,
 
     "globals": {
+        "XHR": true,
         "module": true,
 
         "beforeEach": true,
