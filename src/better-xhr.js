@@ -1,24 +1,35 @@
 (function(global) {
-    function XHR(type, url, data) {
+    "use strict";
+
+    var toString = Object.prototype.toString,
+        arrayToSettings = function(args) {
+            return {
+                method: args[0],
+                url: args[1],
+                data: args[2]
+            };
+        };
+
+    function XHR(type) {
         if (this instanceof XHR) return this;
 
-        var result = new XHR(), i, n;
+        var result = new XHR(), i = 0, n, settings;
 
         if (typeof type === "object") {
-            for (i = 0, n = arguments.length; i < n; ++i) {
-                result[i] = arguments[i];
+            for (n = arguments.length; i < n; ++i) {
+                settings = arguments[i];
+
+                if (toString.call(settings) === "[object Array]") {
+                    settings = arrayToSettings(settings);
+                }
+
+                result[i] = settings;
             }
-
-            result.length = n;
         } else {
-            result[0] = {
-                type: type,
-                url: url,
-                data: data
-            };
-
-            result.length = 1;
+            result[i++] = arrayToSettings(arguments);
         }
+
+        result.length = i;
 
         return result;
     }
@@ -32,7 +43,8 @@
             }
         },
         then: function(fulfilledHandler, errorHandler, progressHandler) {
-            var result = new XHR(), i, n, xhr, settings, prop,
+            var result = new XHR(),
+                data, i, n, xhr, settings, prop, type,
                 onerror = function() {
                     errorCallback(this);
                 },
@@ -72,7 +84,7 @@
                 xhr.onreadystatechange = onreadystatechange;
                 xhr.timeout = settings.timeout || XHR.timeout;
 
-                xhr.open(settings.type.toUpperCase(), settings.url, !settings.sync);
+                xhr.open(settings.method.toUpperCase(), settings.url, !settings.sync);
 
                 settings.headers = settings.headers || XHR.headers;
 
@@ -82,7 +94,30 @@
 
                 result[i] = xhr;
 
-                xhr.send(null);
+                data = settings.data;
+                type = settings.headers["Content-Type"];
+
+                if (!type) {
+                    if (toString.call(settings.data) === "[object Object]") {
+                        data = [];
+
+                        for (prop in settings.data) {
+                            data.push(encodeURIComponent(prop) + "=" + encodeURIComponent(settings.data[prop]));
+                        }
+
+                        data = data.join("&").replace(/%20/g, "+");
+                    }
+
+                    if (typeof data === "string") {
+                        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    }
+                } else if (!type.indexOf("application/json")) {
+                    if (toString.call(settings.data) === "[object Object]") {
+                        data = JSON.stringify(data);
+                    }
+                }
+
+                xhr.send(data);
             }
 
             result.length = this.length;
@@ -91,5 +126,9 @@
         }
     };
 
+    XHR.timeout = 15000;
+    XHR.headers = {"X-Requested-With": "XMLHttpRequest"};
+    XHR.withCredentials = false;
+
     global.XHR = XHR;
-}(this));
+}(window || this));
