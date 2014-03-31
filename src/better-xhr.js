@@ -79,20 +79,29 @@
                 xhr = new XMLHttpRequest();
                 settings = this[i];
 
+                settings.method = settings.method.toUpperCase();
+                settings.cacheBurst = "cacheBurst" in settings ? settings.cacheBurst : XHR.cacheBurst;
+
+                xhr.timeout = settings.timeout || XHR.timeout;
+                xhr.responseType = settings.responseType || XHR.responseType;
+
                 xhr.ontimeout = onerror;
                 xhr.onerror = onerror;
                 xhr.onreadystatechange = onreadystatechange;
-                xhr.timeout = settings.timeout || XHR.timeout;
 
-                xhr.open(settings.method.toUpperCase(), settings.url, !settings.sync);
+                if (settings.method === "GET") {
+                    if (settings.cacheBurst) {
+                        settings.url += (~settings.url.indexOf("?") ? "&" : "?") + "_=" + new Date().getTime();
+                    }
+                }
+
+                xhr.open(settings.method, settings.url, !settings.sync);
 
                 settings.headers = settings.headers || XHR.headers;
 
                 for (prop in settings.headers) {
                     xhr.setRequestHeader(prop, settings.headers[prop]);
                 }
-
-                result[i] = xhr;
 
                 data = settings.data;
                 type = settings.headers["Content-Type"];
@@ -118,6 +127,8 @@
                 }
 
                 xhr.send(data);
+
+                result[i] = xhr;
             }
 
             result.length = this.length;
@@ -129,6 +140,7 @@
     XHR.timeout = 15000;
     XHR.headers = {"X-Requested-With": "XMLHttpRequest"};
     XHR.withCredentials = false;
+    XHR.cacheBurst = "_";
 
     global.XHR = XHR;
 }(window || this));

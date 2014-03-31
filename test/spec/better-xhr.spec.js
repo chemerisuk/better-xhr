@@ -22,7 +22,7 @@ describe("better-xhr", function() {
         mockXhr = jasmine.Ajax.requests.mostRecent();
 
         expect(mockXhr).toBeDefined();
-        expect(mockXhr.url).toBe("url");
+        expect(mockXhr.url.indexOf("url?_=")).toBe(0);
         expect(mockXhr.method).toBe("GET");
 
         mockXhr.response({
@@ -62,5 +62,17 @@ describe("better-xhr", function() {
         expect(mockXhr.method).toBe("POST");
         expect(mockXhr.params).toBe("{\"a\":\"b\",\"c\":123}");
         expect(mockXhr.requestHeaders).toEqual({"Content-Type": "application/json"});
+    });
+
+    it("should not cache GET requests by default", function() {
+        XHR("get", "url").then(this.spy);
+
+        var mockXhr = jasmine.Ajax.requests.mostRecent();
+
+        expect(mockXhr.url.indexOf("url?_=")).toBe(0);
+
+        XHR({method: "get", url: "url1", cacheBurst: false}).then(this.spy);
+        mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(mockXhr.url).toBe("url1");
     });
 });
