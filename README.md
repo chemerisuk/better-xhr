@@ -2,6 +2,8 @@ better-xhr [![Build Status](https://api.travis-ci.org/chemerisuk/better-xhr.png?
 =========================
 > Better abstraction for XMLHttpRequest
 
+__Alpha status - still in development.__
+
 ## API
 There are 3 possible ways to create a XHR instance(s):
 
