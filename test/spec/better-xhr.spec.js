@@ -71,8 +71,12 @@ describe("better-xhr", function() {
 
         expect(mockXhr.url.indexOf("url?_=")).toBe(0);
 
-        XHR({method: "get", url: "url1", cacheBurst: false}).then(this.spy);
+        XHR({method: "get", url: "url1", cacheBurst: "custom"}).then(this.spy);
         mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(mockXhr.url).toBe("url1");
+        expect(mockXhr.url.indexOf("url1?custom=")).toBe(0);
+
+        XHR({method: "get", url: "url2", cacheBurst: false}).then(this.spy);
+        mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(mockXhr.url).toBe("url2");
     });
 });

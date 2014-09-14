@@ -11,8 +11,9 @@
     "index.html",
     "Gruntfile.js",
     "package.json",
-    "bower.json",
-    "main.sublime-project"
+    "bower.json"
   ],
-  "devDependencies": { }
+  "dependencies": {
+    "promise-polyfill": "~1.1.2"
+  }
 }
