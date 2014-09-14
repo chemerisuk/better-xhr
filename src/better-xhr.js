@@ -3,18 +3,13 @@
         config = config || {};
 
         var headers = config.headers || {},
+            charset = config.charset || "UTF-8",
             data = config.data;
 
-        if (Object.prototype.toString.call(config.json) === "[object Object]") {
-            data = JSON.stringify(config.json);
-
-            headers["Content-Type"] = "application/json; charset=UTF-8";
-        }
-
-        if (Object.prototype.toString.call(config.query) === "[object Object]") {
-            data = Object.keys(config.query).reduce(function(memo, key) {
+        if (Object.prototype.toString.call(data) === "[object Object]") {
+            data = Object.keys(data).reduce(function(memo, key) {
                 var name = encodeURIComponent(key),
-                    value = config.query[key];
+                    value = data[key];
 
                 if (Array.isArray(value)) {
                     value.forEach(function(value) {
@@ -26,7 +21,9 @@
 
                 return memo;
             }, []).join("&").replace(/%20/g, "+");
+        }
 
+        if (typeof data === "string") {
             if (method === "get") {
                 url += (~url.indexOf("?") ? "&" : "?") + data;
 
@@ -34,6 +31,12 @@
             } else {
                 headers["Content-Type"] = "application/x-www-form-urlencoded";
             }
+        }
+
+        if (Object.prototype.toString.call(config.json) === "[object Object]") {
+            data = JSON.stringify(config.json);
+
+            headers["Content-Type"] = "application/json; charset=" + charset;
         }
 
         return new Promise(function(resolve, reject) {

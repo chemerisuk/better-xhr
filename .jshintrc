@@ -20,6 +20,7 @@
     "globals": {
         "XHR": true,
         "module": true,
+        "require": true,
 
         "beforeEach": true,
         "afterEach": true,
