@@ -12,7 +12,7 @@ module.exports = function(config) {
         },
         files: [
             "node_modules/jasmine-ajax/lib/mock-ajax.js",
-            "bower_components/promise-polyfill/Promise.js",
+            "node_modules/promise-polyfill/Promise.js",
             "src/*.js",
             "test/spec/*.spec.js"
         ]
