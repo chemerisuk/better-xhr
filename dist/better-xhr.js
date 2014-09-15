@@ -1,20 +1,22 @@
 /**
  * @file src/better-xhr.js
- * @version 0.2.0 2014-09-14T20:03:35
+ * @version 0.2.1 2014-09-15T17:07:26
  * @overview Better abstraction for XMLHttpRequest
  * @copyright Maksim Chemerisuk 2014
  * @license MIT
  * @see https://github.com/chemerisuk/better-xhr
  */
-(function(global) {
-    var XHR = function(method, url, config) {
+(function() {
+    var global = this || window,
+        toString = Object.prototype.toString,
+        XHR = function(method, url, config) {
         config = config || {};
 
         var headers = config.headers || {},
             charset = config.charset || "UTF-8",
             data = config.data;
 
-        if (Object.prototype.toString.call(data) === "[object Object]") {
+        if (toString.call(data) === "[object Object]") {
             data = Object.keys(data).reduce(function(memo, key) {
                 var name = encodeURIComponent(key),
                     value = data[key];
@@ -41,7 +43,7 @@
             }
         }
 
-        if (Object.prototype.toString.call(config.json) === "[object Object]") {
+        if (toString.call(config.json) === "[object Object]") {
             data = JSON.stringify(config.json);
 
             headers["Content-Type"] = "application/json; charset=" + charset;
@@ -100,4 +102,4 @@
 
         global.XHR = XHR;
     }
-})(this);
+})();

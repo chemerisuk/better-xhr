@@ -39,7 +39,7 @@ Configuration of the `XHR` i inspired by excellent [request](https://github.com/
 * Chrome for Android
 
 [travis-url]: http://travis-ci.org/chemerisuk/better-xhr
-[travis-image]: https://api.travis-ci.org/chemerisuk/better-xhr.png?branch=master
+[travis-image]: http://img.shields.io/travis/chemerisuk/better-xhr/master.svg
 
 [coveralls-url]: https://coveralls.io/r/chemerisuk/better-xhr
-[coveralls-image]: https://coveralls.io/repos/chemerisuk/better-xhr/badge.png?branch=master
+[coveralls-image]: http://img.shields.io/coveralls/chemerisuk/better-xhr/master.svg
