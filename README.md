@@ -2,21 +2,22 @@ better-xhr [![Build Status][travis-image]][travis-url] [![Coverage Status][cover
 =========================
 > Better abstraction for XMLHttpRequest
 
-__Alpha status - still in development.__
+The goal for the project is to create simple and lightweight Promise-based implementation for AJAX.
 
 ## API
 
 ```js
-XHR(method, url, config).then(...)
-// or shortcuts
 XHR.get(url, config).then(...);
 XHR.post(url, config).then(...);
+
+// or general method
+XHR(method, url, config).then(...)
+
 ```
 
 Global `XHR` function returns `Promise` object. Promise implementation depends on the [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) project.
 
-## AJAX configuration
-
+## Configuration
 Configuration of the `XHR` i inspired by excellent [request](https://github.com/mikeal/request) project. Basically it uses a plain object to specify any kind of metadata for the `XMLHttpRequest`.
 
 | Property | Type    | Description |
@@ -26,6 +27,18 @@ Configuration of the `XHR` i inspired by excellent [request](https://github.com/
 | `json`   | `Object` or `String` | Specifies JSON data for AJAX request.<br><br>An object value is serialized via `JSON.stringify`. <br><br>Adds `"Content-Type"` header with value `"application/json; charset=UTF-8"`
 | `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>Default value: `"_"`
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
+
+## Defaults
+Use `XHR.defaults` objects to specify your own or override predefine default values. For example:
+
+```
+// set default timeout to 10 seconds
+XHR.defaults.timeout = 10000; 
+
+// add custom header for each request
+XHR.defaults.headers["X-Auth-Token"] = "123";
+
+```
 
 ## Browser support
 #### Desktop
