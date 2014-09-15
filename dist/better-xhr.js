@@ -1,6 +1,6 @@
 /**
  * @file src/better-xhr.js
- * @version 0.2.1 2014-09-15T17:07:26
+ * @version 0.3.0 2014-09-15T20:40:37
  * @overview Better abstraction for XMLHttpRequest
  * @copyright Maksim Chemerisuk 2014
  * @license MIT
@@ -13,7 +13,8 @@
         config = config || {};
 
         var headers = config.headers || {},
-            charset = config.charset || "UTF-8",
+            charset = "charset" in config ? config.charset : "UTF-8",
+            cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data;
 
         if (toString.call(data) === "[object Object]") {
@@ -49,9 +50,16 @@
             headers["Content-Type"] = "application/json; charset=" + charset;
         }
 
+        if (cacheBurst) {
+            url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
+        }
+
         return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
 
+            xhr.onabort = function() { reject(null) };
+            xhr.ontimeout = function() { reject(null) };
+            xhr.onerror = function() { reject(null) };
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     var status = xhr.status;
@@ -71,13 +79,18 @@
             };
 
             xhr.open(method.toUpperCase(), url, true);
+            xhr.timeout = config.timeout || XHR.defaults.timeout;
 
-            if (!("X-Requested-With" in headers)) {
-                headers["X-Requested-With"] = "XMLHttpRequest";
-            }
+            Object.keys(XHR.defaults.headers).forEach(function(key) {
+                if (!(key in headers)) {
+                    headers[key] = XHR.defaults.headers[key];
+                }
+            });
 
             Object.keys(headers).forEach(function(key) {
-                if (headers[key]) xhr.setRequestHeader(key, headers[key]);
+                if (headers[key]) {
+                    xhr.setRequestHeader(key, headers[key]);
+                }
             });
 
             xhr.send(data);
@@ -91,6 +104,14 @@
 
     XHR.post = function(url, config) {
         return XHR("post", url, config);
+    };
+
+    XHR.defaults = {
+        timeout: 15000,
+        cacheBurst: "_",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
     };
 
     if (typeof module !== "undefined" && module.exports) {

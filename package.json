@@ -1,7 +1,7 @@
 {
   "name": "better-xhr",
   "description": "Better abstraction for XMLHttpRequest",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Maksim Chemerisuk",
   "license": "MIT",
   "repository": {
