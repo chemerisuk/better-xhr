@@ -5,7 +5,8 @@
         config = config || {};
 
         var headers = config.headers || {},
-            charset = config.charset || "UTF-8",
+            charset = "charset" in config ? config.charset : "UTF-8",
+            cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data;
 
         if (toString.call(data) === "[object Object]") {
@@ -39,6 +40,10 @@
             data = JSON.stringify(config.json);
 
             headers["Content-Type"] = "application/json; charset=" + charset;
+        }
+
+        if (cacheBurst) {
+            url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
         }
 
         return new Promise(function(resolve, reject) {
