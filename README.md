@@ -22,8 +22,8 @@ Configuration of the `XHR` i inspired by excellent [request](https://github.com/
 | Property | Type    | Description |
 | -------- | ------- | ----------- | 
 | `headers` | `Object` | Specifies extra HTTP headers for request. You can drop any default header via setting it to `null`
-| `data`   | `Object` or `String`| Specifies data that you want to send in AJAX request. Object is serialized via query string algorithm. <ul><li>for `GET` requests `data` argument is appended directly to URL</li><li>otherwise is will be passed into the `XMLHttpRequest#send` call and `"Content-Type"` will be `"application/x-www-form-urlencoded"`</li> 
-| `json`   | `Object` | Specifies JSON data for AJAX request. The object will be serialized via `JSON.stringify` call and request will have `"Content-Type"` to be `"application/json; charset=UTF-8"` 
+| `data`   | `Object` or `String`| Specifies data that you want to send in AJAX request.<br><br>An object value is serialized via query string algorithm.<br><br><ul><li>for `GET` requests `data` argument is appended directly to URL</li><li>otherwise is will be passed into the `XMLHttpRequest#send` call and `"Content-Type"` will be `"application/x-www-form-urlencoded"`</li> 
+| `json`   | `Object` | Specifies JSON data for AJAX request.<br><br>An object value is serialized via `JSON.stringify`. <br><br>Adds `"Content-Type"` header with value `"application/json; charset=UTF-8"`
 
 ## Browser support
 #### Desktop
