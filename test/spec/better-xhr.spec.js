@@ -64,6 +64,30 @@ describe("better-xhr", function() {
         expect(mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json; charset=UTF-8"});
     });
 
+    it("should have default settings", function() {
+        expect(XHR.defaults).toEqual({
+            timeout: 15000,
+            cacheBurst: "_",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        });
+    });
+
+    it("should set timeout", function() {
+        XHR.get("url1").then(this.spy);
+
+        var mockXhr = jasmine.Ajax.requests.mostRecent();
+
+        expect(mockXhr.timeout).toBe(15000);
+
+        XHR.get("url1", {timeout: 10000}).then(this.spy);
+
+        mockXhr = jasmine.Ajax.requests.mostRecent();
+
+        expect(mockXhr.timeout).toBe(10000);
+    });
+
     // it("should not cache GET requests by default", function() {
     //     XHR("get", "url").then(this.spy);
 

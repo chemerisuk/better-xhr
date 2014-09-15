@@ -63,6 +63,7 @@
             };
 
             xhr.open(method.toUpperCase(), url, true);
+            xhr.timeout = config.timeout || XHR.defaults.timeout;
 
             if (!("X-Requested-With" in headers)) {
                 headers["X-Requested-With"] = "XMLHttpRequest";
@@ -83,6 +84,14 @@
 
     XHR.post = function(url, config) {
         return XHR("post", url, config);
+    };
+
+    XHR.defaults = {
+        timeout: 15000,
+        cacheBurst: "_",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
     };
 
     if (typeof module !== "undefined" && module.exports) {
