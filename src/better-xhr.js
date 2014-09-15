@@ -73,9 +73,11 @@
             xhr.open(method.toUpperCase(), url, true);
             xhr.timeout = config.timeout || XHR.defaults.timeout;
 
-            if (!("X-Requested-With" in headers)) {
-                headers["X-Requested-With"] = "XMLHttpRequest";
-            }
+            Object.keys(XHR.defaults.headers).forEach(function(key) {
+                if (!(key in headers)) {
+                    headers[key] = XHR.defaults.headers[key];
+                }
+            });
 
             Object.keys(headers).forEach(function(key) {
                 if (headers[key]) {

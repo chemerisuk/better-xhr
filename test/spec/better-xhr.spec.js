@@ -119,21 +119,54 @@ describe("better-xhr", function() {
         expect(this.mockXhr.url).toBe("url2");
     });
 
-    // it("should handle error responses", function(done) {
-    //     var errorSpy = jasmine.createSpy("error"),
-    //         spy = this.spy;
+    it("should handle error responses", function(done) {
+        XHR.get("url", {cacheBurst: false}).catch(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.response({
+            "status": 500,
+            "responseText": "error response"
+        });
 
-    //     errorSpy.and.callFake(function(text) {
-    //         expect(spy.not.toHaveBeenCalled());
+        this.spy.and.callFake(function(text) {
+            expect(text).toBe("error response");
 
-    //         expect(text).toBeNull();
+            done();
+        });
+    });
 
-    //         done();
-    //     });
+    it("should handle timeouts", function(done) {
+        XHR.get("url", {cacheBurst: false}).catch(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.ontimeout();
 
-    //     XHR.get("url", {cacheBurst: false}).then(spy, errorSpy);
-    //     this.mockXhr = jasmine.Ajax.requests.mostRecent();
-    //     this.mockXhr.abort();
-    //     this.mockXhr.onabort();
-    // });
+        this.spy.and.callFake(function(text) {
+            expect(text).toBeNull();
+
+            done();
+        });
+    });
+
+    it("should handle aborted responses", function(done) {
+        XHR.get("url", {cacheBurst: false}).catch(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.onabort();
+
+        this.spy.and.callFake(function(text) {
+            expect(text).toBeNull();
+
+            done();
+        });
+    });
+
+    it("should handle errored responses", function(done) {
+        XHR.get("url", {cacheBurst: false}).catch(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.onerror();
+
+        this.spy.and.callFake(function(text) {
+            expect(text).toBeNull();
+
+            done();
+        });
+    });
 });
