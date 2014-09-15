@@ -1,12 +1,14 @@
-(function(global) {
-    var XHR = function(method, url, config) {
+(function() {
+    var global = this || window,
+        toString = Object.prototype.toString,
+        XHR = function(method, url, config) {
         config = config || {};
 
         var headers = config.headers || {},
             charset = config.charset || "UTF-8",
             data = config.data;
 
-        if (Object.prototype.toString.call(data) === "[object Object]") {
+        if (toString.call(data) === "[object Object]") {
             data = Object.keys(data).reduce(function(memo, key) {
                 var name = encodeURIComponent(key),
                     value = data[key];
@@ -33,7 +35,7 @@
             }
         }
 
-        if (Object.prototype.toString.call(config.json) === "[object Object]") {
+        if (toString.call(config.json) === "[object Object]") {
             data = JSON.stringify(config.json);
 
             headers["Content-Type"] = "application/json; charset=" + charset;
@@ -92,4 +94,4 @@
 
         global.XHR = XHR;
     }
-})(this);
+})();
