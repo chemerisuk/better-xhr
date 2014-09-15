@@ -24,8 +24,8 @@ Configuration of the `XHR` i inspired by excellent [request](https://github.com/
 | `headers` | `Object` | Specifies extra HTTP headers for request. You can drop any default header via setting it to `null`
 | `data`   | `Object` or `String`| Specifies data that you want to send in AJAX request.<br><br>An object value is serialized via query string algorithm.<br><br><ul><li>for `GET` requests `data` argument is appended directly to URL</li><li>otherwise is will be passed into the `XMLHttpRequest#send` call and `"Content-Type"` will be `"application/x-www-form-urlencoded"`</li> 
 | `json`   | `Object` or `String` | Specifies JSON data for AJAX request.<br><br>An object value is serialized via `JSON.stringify`. <br><br>Adds `"Content-Type"` header with value `"application/json; charset=UTF-8"`
-| `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>By default it's `"_"`
-| `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br> Default value is `15000`
+| `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>Default value: `"_"`
+| `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 
 ## Browser support
 #### Desktop

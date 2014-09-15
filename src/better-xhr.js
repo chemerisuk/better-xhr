@@ -49,6 +49,9 @@
         return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
 
+            xhr.onabort = function() { reject(null) };
+            xhr.ontimeout = function() { reject(null) };
+            xhr.onerror = function() { reject(null) };
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     var status = xhr.status;
@@ -75,7 +78,9 @@
             }
 
             Object.keys(headers).forEach(function(key) {
-                if (headers[key]) xhr.setRequestHeader(key, headers[key]);
+                if (headers[key]) {
+                    xhr.setRequestHeader(key, headers[key]);
+                }
             });
 
             xhr.send(data);

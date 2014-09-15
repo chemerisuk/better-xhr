@@ -1,8 +1,6 @@
 describe("better-xhr", function() {
     "use strict";
 
-    var mockXhr;
-
     beforeEach(function() {
         this.spy = jasmine.createSpy("callback");
 
@@ -16,14 +14,15 @@ describe("better-xhr", function() {
     });
 
     it("should trigger fulfilled handler", function(done) {
-        XHR.get("url", {data: {p1: "v1", p2: 123}}).then(this.spy);
+        XHR.get("url", {cacheBurst: false}).then(this.spy);
 
-        mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
 
-        expect(mockXhr).toBeDefined();
-        expect(mockXhr.method).toBe("GET");
+        expect(this.mockXhr).toBeDefined();
+        expect(this.mockXhr.url).toBe("url");
+        expect(this.mockXhr.method).toBe("GET");
 
-        mockXhr.response({
+        this.mockXhr.response({
             "status": 200,
             "responseText": "awesome response"
         });
@@ -36,36 +35,36 @@ describe("better-xhr", function() {
     });
 
     it("should send query string", function() {
-        XHR.post("url1", {data: "a=b&c=1"}).then(this.spy);
+        XHR.post("url1", {data: "a=b&c=1", cacheBurst: false}).then(this.spy);
 
-        mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
 
-        // expect(mockXhr.url).toBe("url1");
-        expect(mockXhr.method).toBe("POST");
-        expect(mockXhr.params).toBe("a=b&c=1");
-        expect(mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
+        expect(this.mockXhr.url).toBe("url1");
+        expect(this.mockXhr.method).toBe("POST");
+        expect(this.mockXhr.params).toBe("a=b&c=1");
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
     });
 
     it("should serialize object data", function() {
-        XHR.post("url2", {data: {"a+b": "c d", v: 1}}).then(this.spy);
+        XHR.post("url2", {data: {"a+b": "c d", v: 1}, cacheBurst: false}).then(this.spy);
 
-        mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
 
-        // expect(mockXhr.url).toBe("url2");
-        expect(mockXhr.method).toBe("POST");
-        expect(mockXhr.params).toBe("a%2Bb=c+d&v=1");
-        expect(mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
+        expect(this.mockXhr.url).toBe("url2");
+        expect(this.mockXhr.method).toBe("POST");
+        expect(this.mockXhr.params).toBe("a%2Bb=c+d&v=1");
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
     });
 
     it("should send json string", function() {
-        XHR.post("url", {json: {a: "b", c: 123}}).then(this.spy);
+        XHR.post("url", {json: {a: "b", c: 123}, cacheBurst: false}).then(this.spy);
 
-        mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
 
-        // expect(mockXhr.url).toBe("url");
-        expect(mockXhr.method).toBe("POST");
-        expect(mockXhr.params).toBe("{\"a\":\"b\",\"c\":123}");
-        expect(mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json; charset=UTF-8"});
+        expect(this.mockXhr.url).toBe("url");
+        expect(this.mockXhr.method).toBe("POST");
+        expect(this.mockXhr.params).toBe("{\"a\":\"b\",\"c\":123}");
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json; charset=UTF-8"});
     });
 
     it("should have default settings", function() {
@@ -80,41 +79,39 @@ describe("better-xhr", function() {
 
     it("should set timeout", function() {
         XHR.get("url1").then(this.spy);
-
-        mockXhr = jasmine.Ajax.requests.mostRecent();
-
-        expect(mockXhr.timeout).toBe(15000);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(this.mockXhr.timeout).toBe(15000);
 
         XHR.get("url1", {timeout: 10000}).then(this.spy);
-
-        mockXhr = jasmine.Ajax.requests.mostRecent();
-
-        expect(mockXhr.timeout).toBe(10000);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(this.mockXhr.timeout).toBe(10000);
     });
 
     it("should support cache bursting", function() {
         XHR.get("url1").then(this.spy);
-        mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(mockXhr.url.indexOf("url1?_=")).toBe(0);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(this.mockXhr.url.indexOf("url1?_=")).toBe(0);
 
         XHR.get("url2", {cacheBurst: false}).then(this.spy);
-        mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(mockXhr.url).toBe("url2");
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        expect(this.mockXhr.url).toBe("url2");
     });
 
-    // it("should not cache GET requests by default", function() {
-    //     XHR("get", "url").then(this.spy);
+    // it("should handle error responses", function(done) {
+    //     var errorSpy = jasmine.createSpy("error"),
+    //         spy = this.spy;
 
-    //     mockXhr = jasmine.Ajax.requests.mostRecent();
+    //     errorSpy.and.callFake(function(text) {
+    //         expect(spy.not.toHaveBeenCalled());
 
-    //     expect(mockXhr.url.indexOf("url?_=")).toBe(0);
+    //         expect(text).toBeNull();
 
-    //     XHR({method: "get", url: "url1", cacheBurst: "custom"}).then(this.spy);
-    //     mockXhr = jasmine.Ajax.requests.mostRecent();
-    //     expect(mockXhr.url.indexOf("url1?custom=")).toBe(0);
+    //         done();
+    //     });
 
-    //     XHR({method: "get", url: "url2", cacheBurst: false}).then(this.spy);
-    //     mockXhr = jasmine.Ajax.requests.mostRecent();
-    //     expect(mockXhr.url).toBe("url2");
+    //     XHR.get("url", {cacheBurst: false}).then(spy, errorSpy);
+    //     this.mockXhr = jasmine.Ajax.requests.mostRecent();
+    //     this.mockXhr.abort();
+    //     this.mockXhr.onabort();
     // });
 });
