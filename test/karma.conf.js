@@ -3,7 +3,7 @@ module.exports = function(config) {
 
     config.set({
         basePath: "..",
-        frameworks: ["jasmine"],
+        frameworks: ["jasmine-ajax", "jasmine"],
         browsers: ["PhantomJS"],
         preprocessors: { "src/better-xhr.js": "coverage" },
         coverageReporter: {
@@ -11,8 +11,7 @@ module.exports = function(config) {
             dir: "coverage/"
         },
         files: [
-            "node_modules/jasmine-ajax/lib/mock-ajax.js",
-            "node_modules/promise-polyfill/Promise.js",
+            "bower_components/promise-polyfill/Promise.js",
             "src/*.js",
             "test/spec/*.spec.js"
         ]

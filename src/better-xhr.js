@@ -1,4 +1,6 @@
 (function() {
+    "use strict";
+
     var global = this || window,
         toString = Object.prototype.toString,
         XHR = function(method, url, config) {

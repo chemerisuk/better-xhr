@@ -2,7 +2,7 @@ better-xhr [![Build Status][travis-image]][travis-url] [![Coverage Status][cover
 =========================
 > Better abstraction for XMLHttpRequest
 
-The goal for the project is to create simple to use, light-weight and `Promise`-based implementation for the AJAX.
+The goal for the project is to create simple to use, lightweight and `Promise`-based implementation for working with AJAX.
 
 ## API
 
@@ -27,7 +27,7 @@ Use [bower](http://bower.io/) to download the library with all required dependen
 
 This will clone the latest version of the __better-xhr__ into the `bower_components` directory at the root of your project.
 
-Then just append the following scripts on your page before the end of `<body>`:
+Then just append the following scripts on your page:
 
 ```html
 <script src="bower_components/promise-polyfill/Promise.js"></script>
@@ -46,7 +46,7 @@ You can modify `XMLHttpRequest` settings via properties of the `config` object.
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 
 ## Defaults
-`XHR.defaults` object contains all predefined default values. You can modify or override them on demand. For example:
+`XHR.defaults` object contains all predefined default values. You can modify them on demand. For example:
 
 ```js
 // set default timeout to 10 seconds
@@ -61,8 +61,8 @@ XHR.defaults.headers["X-Auth-Token"] = "123";
 * Chrome
 * Safari 6.0+
 * Firefox 16+
+* Internet Explorer 8+
 * Opera 12.10+
-* IE8+
 
 #### Mobile
 * iOS Safari 6+

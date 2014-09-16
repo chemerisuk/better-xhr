@@ -21,7 +21,11 @@ module.exports = function(grunt) {
             },
             unit: {
                 singleRun: true,
-                reporters: ["coverage", "dots"],
+                reporters: ["dots"]
+            },
+            coveralls: {
+                singleRun: true,
+                reporters: ["coverage", "dots", "coveralls"],
                 coverageReporter: {
                     type: "lcovonly",
                     dir: "coverage/"
@@ -46,6 +50,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask("test", ["jshint", "karma:unit"]);
+    grunt.registerTask("travis", ["jshint", "karma:coveralls"]);
     grunt.registerTask("dev", ["jshint", "karma:watch", "watch"]);
     grunt.registerTask("publish", "Publish a new version", function(version) {
         grunt.task.run([
