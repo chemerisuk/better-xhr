@@ -2,23 +2,25 @@ better-xhr [![Build Status][travis-image]][travis-url] [![Coverage Status][cover
 =========================
 > Better abstraction for XMLHttpRequest
 
-The goal for the project is to create simple and lightweight Promise-based implementation for AJAX.
+The goal for the project is to create simple to use, light-weight and `Promise`-based implementation for the AJAX.
 
 ## API
 
 ```js
-XHR.get(url, config).then(...);
-XHR.post(url, config).then(...);
+XHR.get("/test/url").then(function(response) {
+    // do something with response
+});
+
+XHR.post("/test/modify/url", {data: {a: "b"}}).then(successCallback, errorCallback);
 
 // or general method
-XHR(method, url, config).then(...)
-
+XHR(method, url, config).then(success, fail)
 ```
 
-Global `XHR` function returns `Promise` object. Promise implementation depends on the [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) project.
+Global `XHR` function returns a `Promise` object. `Promise` implementation relies on the [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) project, check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API.
 
 ## Configuration
-Configuration of the `XHR` i inspired by excellent [request](https://github.com/mikeal/request) project. Basically it uses a plain object to specify any kind of metadata for the `XMLHttpRequest`.
+Configuration of the `XHR` is inspired by excellent [request](https://github.com/mikeal/request) project. Basically it uses a plain object to specify any kind of metadata for the `XMLHttpRequest` object.
 
 | Property | Type    | Description |
 | -------- | ------- | ----------- | 
@@ -29,15 +31,14 @@ Configuration of the `XHR` i inspired by excellent [request](https://github.com/
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 
 ## Defaults
-Use `XHR.defaults` objects to specify your own or override predefine default values. For example:
+Use `XHR.defaults` objects to specify your own or override predefined default values. For example:
 
-```
+```js
 // set default timeout to 10 seconds
 XHR.defaults.timeout = 10000; 
 
 // add custom header for each request
 XHR.defaults.headers["X-Auth-Token"] = "123";
-
 ```
 
 ## Browser support

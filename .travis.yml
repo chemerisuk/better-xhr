@@ -5,8 +5,3 @@ before_install:
   - npm install -g grunt-cli
 after_success:
   - npm run coveralls
-git:
-  depth: 1
-branches:
-  only:
-    - master
