@@ -54,9 +54,9 @@
         return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
 
-            xhr.onabort = function() { reject(null) };
-            xhr.ontimeout = function() { reject(null) };
-            xhr.onerror = function() { reject(null) };
+            xhr.onabort = function() { reject(new Error("abort")) };
+            xhr.onerror = function() { reject(new Error("fail")) };
+            xhr.ontimeout = function() { reject(new Error("timeout")) };
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     var status = xhr.status;

@@ -147,8 +147,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.ontimeout();
 
-        this.spy.and.callFake(function(text) {
-            expect(text).toBeNull();
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("timeout");
 
             done();
         });
@@ -159,8 +160,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onabort();
 
-        this.spy.and.callFake(function(text) {
-            expect(text).toBeNull();
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("abort");
 
             done();
         });
@@ -171,8 +173,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onerror();
 
-        this.spy.and.callFake(function(text) {
-            expect(text).toBeNull();
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("fail");
 
             done();
         });
