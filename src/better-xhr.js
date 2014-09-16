@@ -3,8 +3,11 @@
 
     var global = this || window,
         toString = Object.prototype.toString,
-        XHR = function(method, url, config) {
+        Promise;
+
+    function XHR(method, url, config) {
         config = config || {};
+        method = method.toUpperCase();
 
         var headers = config.headers || {},
             charset = "charset" in config ? config.charset : "UTF-8",
@@ -29,7 +32,7 @@
         }
 
         if (typeof data === "string") {
-            if (method === "get") {
+            if (method === "GET") {
                 url += (~url.indexOf("?") ? "&" : "?") + data;
 
                 data = null;
@@ -44,7 +47,7 @@
             headers["Content-Type"] = "application/json; charset=" + charset;
         }
 
-        if (cacheBurst) {
+        if (cacheBurst && method === "GET") {
             url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
         }
 
@@ -72,7 +75,7 @@
                 }
             };
 
-            xhr.open(method.toUpperCase(), url, true);
+            xhr.open(method, url, true);
             xhr.timeout = config.timeout || XHR.defaults.timeout;
 
             Object.keys(XHR.defaults.headers).forEach(function(key) {
@@ -89,8 +92,7 @@
 
             xhr.send(data);
         });
-    },
-    Promise;
+    };
 
     XHR.get = function(url, config) {
         return XHR("get", url, config);

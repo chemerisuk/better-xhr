@@ -109,14 +109,22 @@ describe("better-xhr", function() {
         expect(this.mockXhr.timeout).toBe(10000);
     });
 
-    it("should support cache bursting", function() {
-        XHR.get("url1").then(this.spy);
-        this.mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(this.mockXhr.url.indexOf("url1?_=")).toBe(0);
+    describe("cache bursting", function() {
+        it("should append extra param by default", function() {
+            XHR.get("url1").then(this.spy);
+            this.mockXhr = jasmine.Ajax.requests.mostRecent();
+            expect(this.mockXhr.url.indexOf("url1?" + XHR.defaults.cacheBurst)).toBe(0);
 
-        XHR.get("url2", {cacheBurst: false}).then(this.spy);
-        this.mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(this.mockXhr.url).toBe("url2");
+            XHR.get("url2", {cacheBurst: false}).then(this.spy);
+            this.mockXhr = jasmine.Ajax.requests.mostRecent();
+            expect(this.mockXhr.url).toBe("url2");
+        });
+
+        it("should work only for GET requests", function() {
+            XHR.post("url", {a: "b"}).then(this.spy);
+            this.mockXhr = jasmine.Ajax.requests.mostRecent();
+            expect(this.mockXhr.url).toBe("url");
+        });
     });
 
     it("should handle error responses", function(done) {
