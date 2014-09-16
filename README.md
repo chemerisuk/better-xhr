@@ -19,14 +19,29 @@ XHR(method, url, config).then(success, fail)
 
 Global `XHR` function returns a `Promise` object. `Promise` implementation relies on the [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) project, check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API.
 
+Installing
+----------
+Use [bower](http://bower.io/) to download this extension with all required dependencies.
+
+    bower install better-xhr
+
+This will clone the latest version of the __better-xhr__ into the `bower_components` directory at the root of your project.
+
+Then append just the following scripts on your page before the end of `<body>`:
+
+```js
+<script src="bower_components/promise-polyfill/Promise.js"></script>
+<script src="bower_components/better-dom/dist/better-xhr.js"></script>
+```
+
 ## Configuration
-Configuration of the `XHR` is inspired by excellent [request](https://github.com/mikeal/request) project. Basically it uses a plain object to specify any kind of metadata for the `XMLHttpRequest` object.
+You can modify AJAX setting via properties of the `config` object.
 
 | Property | Type    | Description |
 | -------- | ------- | ----------- | 
-| `headers` | `Object` | Specifies extra HTTP headers for request. You can drop any default header via setting it to `null`
 | `data`   | `Object` or `String`| Specifies data that you want to send in AJAX request.<br><br>An object value is serialized via query string algorithm.<br><br><ul><li>for `GET` requests `data` argument is appended directly to URL</li><li>otherwise is will be passed into the `XMLHttpRequest#send` call and `"Content-Type"` will be `"application/x-www-form-urlencoded"`</li> 
 | `json`   | `Object` or `String` | Specifies JSON data for AJAX request.<br><br>An object value is serialized via `JSON.stringify`. <br><br>Adds `"Content-Type"` header with value `"application/json; charset=UTF-8"`
+| `headers` | `Object` | Specifies extra HTTP headers for request. You can drop any default header via setting it to `null`
 | `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>Default value: `"_"`
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 
