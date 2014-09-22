@@ -42,7 +42,7 @@ describe("better-xhr", function() {
         expect(this.mockXhr.url).toBe("url1");
         expect(this.mockXhr.method).toBe("POST");
         expect(this.mockXhr.params).toBe("a=b&c=1");
-        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"});
     });
 
     it("should send query string for GET requests", function() {
@@ -64,7 +64,7 @@ describe("better-xhr", function() {
         expect(this.mockXhr.url).toBe("url4");
         expect(this.mockXhr.method).toBe("POST");
         expect(this.mockXhr.params).toBe("a=1&a=2");
-        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"});
     });
 
     it("should serialize object data", function() {
@@ -75,7 +75,7 @@ describe("better-xhr", function() {
         expect(this.mockXhr.url).toBe("url2");
         expect(this.mockXhr.method).toBe("POST");
         expect(this.mockXhr.params).toBe("a%2Bb=c+d&v=1");
-        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded"});
+        expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"});
     });
 
     it("should send json string", function() {
@@ -93,6 +93,7 @@ describe("better-xhr", function() {
         expect(XHR.defaults).toEqual({
             timeout: 15000,
             cacheBurst: "_",
+            charset: "UTF-8",
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
             }

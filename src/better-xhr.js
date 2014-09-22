@@ -10,7 +10,7 @@
         method = method.toUpperCase();
 
         var headers = config.headers || {},
-            charset = "charset" in config ? config.charset : "UTF-8",
+            charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data;
 
@@ -37,7 +37,7 @@
 
                 data = null;
             } else {
-                headers["Content-Type"] = "application/x-www-form-urlencoded";
+                headers["Content-Type"] = "application/x-www-form-urlencoded; charset=" + charset;
             }
         }
 
@@ -92,7 +92,7 @@
 
             xhr.send(data);
         });
-    };
+    }
 
     XHR.get = function(url, config) {
         return XHR("get", url, config);
@@ -105,6 +105,7 @@
     XHR.defaults = {
         timeout: 15000,
         cacheBurst: "_",
+        charset: "UTF-8",
         headers: {
             "X-Requested-With": "XMLHttpRequest"
         }
@@ -112,11 +113,9 @@
 
     if (typeof module !== "undefined" && module.exports) {
         Promise = require("promise-polyfill");
-
-        module.exports = XHR;
     } else {
         Promise = global.Promise;
-
-        global.XHR = XHR;
     }
+
+    global.XHR = XHR;
 })();
