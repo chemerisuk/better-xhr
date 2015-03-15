@@ -1,16 +1,11 @@
-/* globals module, require */
+(function(window, CONTENT_TYPE) {
+    "use strict"; /* es6-transpiler has-iterators:false, has-generators: false */
 
-(function(CONTENT_TYPE) {
-    "use strict";
-
-    var global = this || window,
+    var Promise = window.Promise,
         toString = Object.prototype.toString,
-        Promise;
+        isSimpleObject = (o) => toString.call(o) === "[object Object]";
 
-    /* es6-transpiler has-iterators:false, has-generators: false */
-
-    function XHR(method, url, config) {
-        config = config || {};
+    function XHR(method, url, config = {}) {
         method = method.toUpperCase();
 
         var headers = config.headers || {},
@@ -19,7 +14,7 @@
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data;
 
-        if (toString.call(data) === "[object Object]") {
+        if (isSimpleObject(data)) {
             data = Object.keys(data).reduce((memo, key) => {
                 var name = encodeURIComponent(key),
                     value = data[key];
@@ -46,7 +41,7 @@
             }
         }
 
-        if (toString.call(config.json) === "[object Object]") {
+        if (isSimpleObject(config.json)) {
             data = JSON.stringify(config.json);
 
             contentType = contentType || "application/json";
@@ -166,6 +161,7 @@
         return result;
     };
 
+    // useful defaults
     XHR.defaults = {
         timeout: 15000,
         cacheBurst: "_",
@@ -173,11 +169,6 @@
         headers: { "X-Requested-With": "XMLHttpRequest" }
     };
 
-    if (typeof module !== "undefined" && module.exports) {
-        Promise = require("promise-polyfill");
-    } else {
-        Promise = global.Promise;
-    }
-
-    global.XHR = XHR;
-})("Content-Type");
+    // expose namespace globally
+    window.XHR = XHR;
+})(window, "Content-Type");
