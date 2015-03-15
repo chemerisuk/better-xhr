@@ -90,16 +90,13 @@
                 });
 
                 Object.keys(headers).forEach((key) => {
-                    if (headers[key]) {
-                        xhr.setRequestHeader(key, headers[key]);
-                    }
+                    xhr.setRequestHeader(key, String(headers[key]));
                 });
 
                 xhr.send(data);
             });
 
         promise[0] = xhr;
-        promise.abort = () => xhr.abort();
 
         return promise;
     }
@@ -169,6 +166,10 @@
         headers: { "X-Requested-With": "XMLHttpRequest" }
     };
 
-    // expose namespace globally
-    window.XHR = XHR;
+    if (Promise) {
+        // expose namespace globally
+        window.XHR = XHR;
+    } else {
+        throw new Error("In order to use XHR you have to include a Promise polyfill");
+    }
 })(window, "Content-Type");

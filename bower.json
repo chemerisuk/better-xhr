@@ -8,12 +8,7 @@
     ".*",
     "test",
     "src",
-    "index.html",
-    "Gruntfile.js",
     "package.json",
     "bower.json"
-  ],
-  "dependencies": {
-    "promise-polyfill": "~1.1.4"
-  }
+  ]
 }

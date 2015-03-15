@@ -17,7 +17,7 @@ XHR.post("/test/modify/url", {data: {a: "b"}}).then(successCallback, errorCallba
 XHR(method, url, config).then(success, fail)
 ```
 
-Global `XHR` function returns a `Promise` object. `Promise` implementation relies on the [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) project, check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API.
+Global `XHR` function returns a `Promise` object. Check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API. If you need to support browsers that don't have `Promise` yet, include a polyfill.
 
 Installing
 ----------
@@ -30,7 +30,6 @@ This will clone the latest version of the __better-xhr__ into the `bower_compone
 Then just append the following scripts on your page:
 
 ```html
-<script src="bower_components/promise-polyfill/Promise.js"></script>
 <script src="bower_components/better-xhr/dist/better-xhr.js"></script>
 ```
 
@@ -52,9 +51,8 @@ You can modify `XMLHttpRequest` settings via properties of the `config` object.
 ```js
 // set default timeout to 10 seconds
 XHR.defaults.timeout = 10000; 
-
 // add custom header for each request
-XHR.defaults.headers["X-Auth-Token"] = "123";
+XHR.defaults.headers["Authorization"] = "Basic Zm9vOmJhcg==";
 ```
 
 ## Browser support

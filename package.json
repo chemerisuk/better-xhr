@@ -9,7 +9,8 @@
     "url": "https://github.com/chemerisuk/better-xhr"
   },
   "devDependencies": {
-    "better-dom-boilerplate": "git://github.com/chemerisuk/better-dom-boilerplate.git"
+    "better-dom-boilerplate": "git://github.com/chemerisuk/better-dom-boilerplate.git",
+    "es6-promise-polyfill": "^1.0.0"
   },
   "config": {
     "gulp": "--gulpfile node_modules/better-dom-boilerplate/gulpfile.js --cwd ."
@@ -21,6 +22,6 @@
     "postrelease": "gulp gh-pages $npm_package_config_gulp"
   },
   "karmaFiles": [
-    "bower_components/promise-polyfill/Promise.js"
+    "node_modules/es6-promise-polyfill/promise.js"
   ]
 }
