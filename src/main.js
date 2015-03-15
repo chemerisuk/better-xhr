@@ -1,3 +1,5 @@
+/* globals module, require */
+
 (function() {
     "use strict";
 

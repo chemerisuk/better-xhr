@@ -9,21 +9,18 @@
     "url": "https://github.com/chemerisuk/better-xhr"
   },
   "devDependencies": {
-    "grunt": "^0.4.3",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-watch": "^0.6.0",
-    "grunt-github-publish": "^0.1.1",
-    "grunt-karma": "^0.9.0",
-    "grunt-shell": "~0.6.0",
-    "karma": "^0.12.0",
-    "karma-coverage": "^0.1",
-    "karma-coveralls": "^0.1.4",
-    "karma-jasmine": "^0.2",
-    "karma-jasmine-ajax": "^0.1.4",
-    "karma-phantomjs-launcher": "^0.1"
+    "better-dom-boilerplate": "git://github.com/chemerisuk/better-dom-boilerplate.git"
+  },
+  "config": {
+    "gulp": "--gulpfile node_modules/better-dom-boilerplate/gulpfile.js --cwd ."
   },
   "scripts": {
-    "test": "grunt test",
-    "start": "grunt dev"
-  }
+    "test": "gulp test $npm_package_config_gulp",
+    "start": "gulp dev $npm_package_config_gulp",
+    "release": "gulp release $npm_package_config_gulp",
+    "postrelease": "gulp gh-pages $npm_package_config_gulp"
+  },
+  "karmaFiles": [
+    "bower_components/promise-polyfill/Promise.js"
+  ]
 }

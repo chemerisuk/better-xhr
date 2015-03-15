@@ -1,3 +1,5 @@
+/* globals XHR */
+
 describe("better-xhr", function() {
     "use strict";
 
@@ -22,7 +24,7 @@ describe("better-xhr", function() {
         expect(this.mockXhr.url).toBe("url");
         expect(this.mockXhr.method).toBe("GET");
 
-        this.mockXhr.response({
+        this.mockXhr.respondWith({
             "status": 200,
             "responseText": "awesome response"
         });
@@ -131,7 +133,7 @@ describe("better-xhr", function() {
     it("should handle error responses", function(done) {
         XHR.get("url", {cacheBurst: false}).catch(this.spy);
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
-        this.mockXhr.response({
+        this.mockXhr.respondWith({
             "status": 500,
             "responseText": "error response"
         });

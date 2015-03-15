@@ -31,7 +31,7 @@ Then just append the following scripts on your page:
 
 ```html
 <script src="bower_components/promise-polyfill/Promise.js"></script>
-<script src="bower_components/better-dom/dist/better-xhr.js"></script>
+<script src="bower_components/better-xhr/dist/better-xhr.js"></script>
 ```
 
 ## Configuration
@@ -44,6 +44,7 @@ You can modify `XMLHttpRequest` settings via properties of the `config` object.
 | `headers` | `Object` | Specifies extra HTTP headers for request. You can drop any default header via setting it to `null`
 | `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>Default value: `"_"`
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
+| `charset` | `String` | Specifies character encoding.<br><br>Default value: `"UTF-8"`
 
 ## Defaults
 `XHR.defaults` object contains all predefined default values. You can modify them on demand. For example:
