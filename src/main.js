@@ -104,6 +104,61 @@
         return XHR("post", url, config);
     };
 
+    XHR.serialize = (elements) => {
+        var result = {};
+
+        if ("form" in elements) {
+            elements = [elements];
+        } else if ("elements" in elements) {
+            elements = elements.elements;
+        } else {
+            elements = [];
+        }
+
+        for (var i = 0, n = elements.length, el, name; i < n; ++i) {
+            el = elements[i];
+            name = el.name;
+
+            if (el.disabled || !name) continue;
+
+            switch(el.type) {
+            case "select-multiple":
+                result[name] = [];
+                /* falls through */
+            case "select-one":
+                for (var options = el.options, j = 0, k = options.length, option; j < k; ++j) {
+                    option = options[j];
+
+                    if (option.selected) {
+                        if (name in result) {
+                            result[name].push(option.value);
+                        } else {
+                            result[name] = option.value;
+                        }
+                    }
+                }
+                break;
+
+            case undefined:
+            case "fieldset": // fieldset
+            case "file": // file input
+            case "submit": // submit button
+            case "reset": // reset button
+            case "button": // custom button
+                break;
+
+            case "radio": // radio button
+            case "checkbox": // checkbox
+                if (!el.checked) break;
+                /* falls through */
+            default:
+                result[name] = el.value;
+            }
+        }
+
+        return result;
+    };
+
     XHR.defaults = {
         timeout: 15000,
         cacheBurst: "_",
