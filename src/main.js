@@ -62,47 +62,51 @@
             url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
         }
 
-        return new Promise((resolve, reject) => {
-            var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
+        var promise = new Promise((resolve, reject) => {
+                xhr.onabort = () => { reject(Error("abort")) };
+                xhr.onerror = () => { reject(Error("fail")) };
+                xhr.ontimeout = () => { reject(Error("timeout")) };
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4) {
+                        var status = xhr.status;
 
-            xhr.onabort = () => { reject(new Error("abort")) };
-            xhr.onerror = () => { reject(new Error("fail")) };
-            xhr.ontimeout = () => { reject(new Error("timeout")) };
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                    var status = xhr.status;
+                        data = xhr.responseText;
 
-                    data = xhr.responseText;
+                        try {
+                            data = JSON.parse(data);
+                        } catch (err) {}
 
-                    try {
-                        data = JSON.parse(data);
-                    } catch (err) {}
-
-                    if (status >= 200 && status < 300 || status === 304) {
-                        resolve(data);
-                    } else {
-                        reject(data);
+                        if (status >= 200 && status < 300 || status === 304) {
+                            resolve(data);
+                        } else {
+                            reject(data);
+                        }
                     }
-                }
-            };
+                };
 
-            xhr.open(method, url, true);
-            xhr.timeout = config.timeout || XHR.defaults.timeout;
+                xhr.open(method, url, true);
+                xhr.timeout = config.timeout || XHR.defaults.timeout;
 
-            Object.keys(XHR.defaults.headers).forEach((key) => {
-                if (!(key in headers)) {
-                    headers[key] = XHR.defaults.headers[key];
-                }
+                Object.keys(XHR.defaults.headers).forEach((key) => {
+                    if (!(key in headers)) {
+                        headers[key] = XHR.defaults.headers[key];
+                    }
+                });
+
+                Object.keys(headers).forEach((key) => {
+                    if (headers[key]) {
+                        xhr.setRequestHeader(key, headers[key]);
+                    }
+                });
+
+                xhr.send(data);
             });
 
-            Object.keys(headers).forEach((key) => {
-                if (headers[key]) {
-                    xhr.setRequestHeader(key, headers[key]);
-                }
-            });
+        promise[0] = xhr;
+        promise.abort = () => xhr.abort();
 
-            xhr.send(data);
-        });
+        return promise;
     }
 
     // define shortcuts
@@ -166,9 +170,7 @@
         timeout: 15000,
         cacheBurst: "_",
         charset: "UTF-8",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        }
+        headers: { "X-Requested-With": "XMLHttpRequest" }
     };
 
     if (typeof module !== "undefined" && module.exports) {
