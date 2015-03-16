@@ -1,7 +1,7 @@
 {
   "name": "better-xhr",
   "description": "Better abstraction for XMLHttpRequest",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "author": "Maksim Chemerisuk",
   "license": "MIT",
   "repository": {
@@ -18,8 +18,7 @@
   "scripts": {
     "test": "gulp test $npm_package_config_gulp",
     "start": "gulp dev $npm_package_config_gulp",
-    "release": "gulp release $npm_package_config_gulp",
-    "postrelease": "gulp gh-pages $npm_package_config_gulp"
+    "release": "gulp release $npm_package_config_gulp"
   },
   "karmaFiles": [
     "node_modules/es6-promise-polyfill/promise.js"
