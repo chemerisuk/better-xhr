@@ -1,5 +1,4 @@
-better-xhr [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url]
-=========================
+# better-xhr<br>[![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Bower version][bower-image]][bower-url]
 > Better abstraction for XMLHttpRequest
 
 The goal for the project is to create simple to use, lightweight and `Promise`-based implementation for working with AJAX.
@@ -17,10 +16,9 @@ XHR.post("/test/modify/url", {data: {a: "b"}}).then(successCallback, errorCallba
 XHR(method, url, config).then(success, fail)
 ```
 
-Global `XHR` function returns a `Promise` object. Check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API. If you need to support browsers that don't have `Promise` yet, include a polyfill.
+Global `XHR` function returns a `Promise` object. Check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API.
 
-Installing
-----------
+## Installing
 Use [bower](http://bower.io/) to download the library with all required dependencies.
 
     bower install better-xhr
@@ -33,6 +31,8 @@ Then just append the following scripts on your page:
 <script src="bower_components/better-xhr/dist/better-xhr.js"></script>
 ```
 
+NOTE: for browsers that don't have a `Promise` yet, include a polyfill.
+
 ## Configuration
 You can modify `XMLHttpRequest` settings via properties of the `config` object.
 
@@ -44,6 +44,26 @@ You can modify `XMLHttpRequest` settings via properties of the `config` object.
 | `cacheBurst` | `String` | Cache bursting parameter. Allows to specify name of the extra dummy argument that disables caching.<br><br>Default value: `"_"`
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 | `charset` | `String` | Specifies character encoding.<br><br>Default value: `"UTF-8"`
+
+## Method `serialize`
+The plugin introduces static method `XHR.serialize`. This method can be used to collect a form data for AJAX requests. Returned object is a key/value map of form elements. For example
+
+```html
+<form id="myform" action="/some-url">
+    <input type="text" name="user" value="user1">
+    <select name="gender">
+        <option value="m" selected>Male</option>
+        <option value="f">Female</option>
+    </select>
+</form>
+```
+
+can be serialized like below:
+
+```js
+XHR.serialize(document.getElementById("myform"));
+// => {user: "user1", "gender": "m"}
+```
 
 ## Defaults
 `XHR.defaults` object contains all predefined default values. You can modify them on demand. For example:
@@ -68,8 +88,13 @@ XHR.defaults.headers["Authorization"] = "Basic Zm9vOmJhcg==";
 * Android 2.3+
 * Chrome for Android
 
+NOTE: for IE8-9 cross-domain requests are not supported because of [limited capabilities](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx) of legacy `XDomainRequest` object.
+
 [travis-url]: http://travis-ci.org/chemerisuk/better-xhr
 [travis-image]: http://img.shields.io/travis/chemerisuk/better-xhr/master.svg
 
 [coveralls-url]: https://coveralls.io/r/chemerisuk/better-xhr
 [coveralls-image]: http://img.shields.io/coveralls/chemerisuk/better-xhr/master.svg
+
+[bower-url]: https://github.com/chemerisuk/better-xhr
+[bower-image]: http://img.shields.io/bower/v/better-xhr.svg
