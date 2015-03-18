@@ -102,6 +102,17 @@ describe("better-xhr", function() {
         });
     });
 
+    it("allows to override default headers", function() {
+        XHR.get("url4", {cacheBurst: false, headers: {"X-Requested-With": null}}).then(this.spy);
+
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+
+        expect(this.mockXhr.url).toBe("url4");
+        expect(this.mockXhr.method).toBe("GET");
+        expect(this.mockXhr.params).toBeUndefined();
+        expect(this.mockXhr.requestHeaders).toEqual({});
+    });
+
     it("should set timeout", function() {
         XHR.get("url1").then(this.spy);
         this.mockXhr = jasmine.Ajax.requests.mostRecent();

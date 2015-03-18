@@ -13,7 +13,7 @@ XHR.get("/test/url").then(function(response) {
 XHR.post("/test/modify/url", {data: {a: "b"}}).then(successCallback, errorCallback);
 
 // or general method
-XHR(method, url, config).then(success, fail)
+XHR(method, url, config).then(success, fail);
 ```
 
 Global `XHR` function returns a `Promise` object. Check out the [article HTML5Rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) for details on it's API.

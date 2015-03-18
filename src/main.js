@@ -90,7 +90,11 @@
                 });
 
                 Object.keys(headers).forEach((key) => {
-                    xhr.setRequestHeader(key, String(headers[key]));
+                    var headerValue = headers[key];
+
+                    if (headerValue != null) {
+                        xhr.setRequestHeader(key, String(headerValue));
+                    }
                 });
 
                 xhr.send(data);
