@@ -66,12 +66,21 @@
                 xhr.ontimeout = handleErrorResponse();
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4) {
-                        var status = xhr.status;
+                        var status = xhr.status,
+                            response = xhr.responseText,
+                            contentType = xhr.getResponseHeader("Content-Type");
 
-                        data = xhr.responseText;
+                        // parse response depending on Content-Type
+                        if (contentType === "application/json") {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (err) {
+                                return reject(err);
+                            }
+                        }
 
                         if (status >= 200 && status < 300 || status === 304) {
-                            resolve(data);
+                            resolve(response);
                         } else {
                             reject(xhr);
                         }

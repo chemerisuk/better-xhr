@@ -26,6 +26,7 @@ describe("better-xhr", function() {
 
         this.mockXhr.respondWith({
             "status": 200,
+            "contentType": "text/plain",
             "responseText": "awesome response"
         });
 
@@ -96,6 +97,7 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.respondWith({
             "status": 500,
+            "contentType": "text/plain",
             "responseText": "error response"
         });
 
@@ -139,6 +141,24 @@ describe("better-xhr", function() {
 
         this.spy.and.callFake(function(obj) {
             expect(obj instanceof XMLHttpRequest).toBe(true);
+
+            done();
+        });
+    });
+
+    it("parses JSON reponses", function(done) {
+        var response = {a: "b"};
+
+        XHR.get("url", {json: false}).then(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.respondWith({
+            "status": 200,
+            "contentType": "application/json",
+            "responseText": JSON.stringify(response)
+        });
+
+        this.spy.and.callFake(function(data) {
+            expect(data).toEqual(response);
 
             done();
         });
