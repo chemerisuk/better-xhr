@@ -1,4 +1,4 @@
-(function(window, CONTENT_TYPE) {
+(function(window, CONTENT_TYPE, MIME_JSON) {
     "use strict"; /* es6-transpiler has-iterators:false, has-generators: false */
 
     var Promise = window.Promise,
@@ -44,7 +44,7 @@
         if (isSimpleObject(config.json)) {
             data = JSON.stringify(config.json);
 
-            contentType = contentType || "application/json";
+            contentType = contentType || MIME_JSON;
         }
 
         if (contentType) {
@@ -68,10 +68,9 @@
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
                             response = xhr.responseText,
-                            contentType = xhr.getResponseHeader("Content-Type");
-
+                            contentType = xhr.getResponseHeader(CONTENT_TYPE);
                         // parse response depending on Content-Type
-                        if (contentType === "application/json") {
+                        if (contentType === MIME_JSON) {
                             try {
                                 response = JSON.parse(response);
                             } catch (err) {
@@ -183,4 +182,4 @@
     } else {
         throw new Error("In order to use XHR you have to include a Promise polyfill");
     }
-})(window, "Content-Type");
+})(window, "Content-Type", "application/json");
