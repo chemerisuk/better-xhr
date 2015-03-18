@@ -59,23 +59,21 @@
 
         var xhr = new XMLHttpRequest();
         var promise = new Promise((resolve, reject) => {
-                xhr.onabort = () => { reject(Error("abort")) };
-                xhr.onerror = () => { reject(Error("fail")) };
-                xhr.ontimeout = () => { reject(Error("timeout")) };
+                var handleErrorResponse = () => () => reject(xhr);
+
+                xhr.onabort = handleErrorResponse();
+                xhr.onerror = handleErrorResponse();
+                xhr.ontimeout = handleErrorResponse();
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4) {
                         var status = xhr.status;
 
                         data = xhr.responseText;
 
-                        try {
-                            data = JSON.parse(data);
-                        } catch (err) {}
-
                         if (status >= 200 && status < 300 || status === 304) {
                             resolve(data);
                         } else {
-                            reject(data);
+                            reject(xhr);
                         }
                     }
                 };

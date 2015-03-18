@@ -91,56 +91,6 @@ describe("better-xhr", function() {
         expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json; charset=UTF-8"});
     });
 
-    it("should have default settings", function() {
-        expect(XHR.defaults).toEqual({
-            timeout: 15000,
-            cacheBurst: "_",
-            charset: "UTF-8",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        });
-    });
-
-    it("allows to override default headers", function() {
-        XHR.get("url4", {cacheBurst: false, headers: {"X-Requested-With": null}}).then(this.spy);
-
-        this.mockXhr = jasmine.Ajax.requests.mostRecent();
-
-        expect(this.mockXhr.url).toBe("url4");
-        expect(this.mockXhr.method).toBe("GET");
-        expect(this.mockXhr.params).toBeUndefined();
-        expect(this.mockXhr.requestHeaders).toEqual({});
-    });
-
-    it("should set timeout", function() {
-        XHR.get("url1").then(this.spy);
-        this.mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(this.mockXhr.timeout).toBe(15000);
-
-        XHR.get("url1", {timeout: 10000}).then(this.spy);
-        this.mockXhr = jasmine.Ajax.requests.mostRecent();
-        expect(this.mockXhr.timeout).toBe(10000);
-    });
-
-    describe("cache bursting", function() {
-        it("should append extra param by default", function() {
-            XHR.get("url1").then(this.spy);
-            this.mockXhr = jasmine.Ajax.requests.mostRecent();
-            expect(this.mockXhr.url.indexOf("url1?" + XHR.defaults.cacheBurst)).toBe(0);
-
-            XHR.get("url2", {cacheBurst: false}).then(this.spy);
-            this.mockXhr = jasmine.Ajax.requests.mostRecent();
-            expect(this.mockXhr.url).toBe("url2");
-        });
-
-        it("should work only for GET requests", function() {
-            XHR.post("url", {a: "b"}).then(this.spy);
-            this.mockXhr = jasmine.Ajax.requests.mostRecent();
-            expect(this.mockXhr.url).toBe("url");
-        });
-    });
-
     it("should handle error responses", function(done) {
         XHR.get("url", {cacheBurst: false}).catch(this.spy);
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
@@ -149,8 +99,10 @@ describe("better-xhr", function() {
             "responseText": "error response"
         });
 
-        this.spy.and.callFake(function(text) {
-            expect(text).toBe("error response");
+        this.spy.and.callFake(function(obj) {
+            expect(obj instanceof XMLHttpRequest).toBe(true);
+            expect(obj.responseText).toBe("error response");
+            expect(obj.status).toBe(500);
 
             done();
         });
@@ -161,9 +113,8 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.ontimeout();
 
-        this.spy.and.callFake(function(err) {
-            expect(err instanceof Error).toBe(true);
-            expect(err.message).toBe("timeout");
+        this.spy.and.callFake(function(obj) {
+            expect(obj instanceof XMLHttpRequest).toBe(true);
 
             done();
         });
@@ -174,9 +125,8 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onabort();
 
-        this.spy.and.callFake(function(err) {
-            expect(err instanceof Error).toBe(true);
-            expect(err.message).toBe("abort");
+        this.spy.and.callFake(function(obj) {
+            expect(obj instanceof XMLHttpRequest).toBe(true);
 
             done();
         });
@@ -187,9 +137,8 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onerror();
 
-        this.spy.and.callFake(function(err) {
-            expect(err instanceof Error).toBe(true);
-            expect(err.message).toBe("fail");
+        this.spy.and.callFake(function(obj) {
+            expect(obj instanceof XMLHttpRequest).toBe(true);
 
             done();
         });
