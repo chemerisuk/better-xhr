@@ -1,11 +1,11 @@
 /**
  * better-xhr: Better abstraction for XMLHttpRequest
- * @version 0.4.0 Mon, 16 Mar 2015 10:02:52 GMT
- * @link 
- * @copyright 2014 Maksim Chemerisuk
+ * @version 0.4.1 Thu, 19 Mar 2015 21:50:10 GMT
+ * @link https://github.com/chemerisuk/better-xhr
+ * @copyright 2015 Maksim Chemerisuk
  * @license MIT
  */
-(function(window, CONTENT_TYPE) {
+(function(window, CONTENT_TYPE, MIME_JSON) {
     "use strict"; /* es6-transpiler has-iterators:false, has-generators: false */
 
     var Promise = window.Promise,
@@ -51,7 +51,7 @@
         if (isSimpleObject(config.json)) {
             data = JSON.stringify(config.json);
 
-            contentType = contentType || "application/json";
+            contentType = contentType || MIME_JSON;
         }
 
         if (contentType) {
@@ -66,23 +66,29 @@
 
         var xhr = new XMLHttpRequest();
         var promise = new Promise(function(resolve, reject)  {
-                xhr.onabort = function()  { reject(Error("abort")) };
-                xhr.onerror = function()  { reject(Error("fail")) };
-                xhr.ontimeout = function()  { reject(Error("timeout")) };
+                var handleErrorResponse = function()  {return function()  {return reject(xhr)}};
+
+                xhr.onabort = handleErrorResponse();
+                xhr.onerror = handleErrorResponse();
+                xhr.ontimeout = handleErrorResponse();
                 xhr.onreadystatechange = function()  {
                     if (xhr.readyState === 4) {
-                        var status = xhr.status;
-
-                        data = xhr.responseText;
-
-                        try {
-                            data = JSON.parse(data);
-                        } catch (err) {}
+                        var status = xhr.status,
+                            response = xhr.responseText,
+                            contentType = xhr.getResponseHeader(CONTENT_TYPE);
+                        // parse response depending on Content-Type
+                        if (contentType === MIME_JSON) {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (err) {
+                                return reject(err);
+                            }
+                        }
 
                         if (status >= 200 && status < 300 || status === 304) {
-                            resolve(data);
+                            resolve(response);
                         } else {
-                            reject(data);
+                            reject(xhr);
                         }
                     }
                 };
@@ -97,7 +103,11 @@
                 });
 
                 Object.keys(headers).forEach(function(key)  {
-                    xhr.setRequestHeader(key, String(headers[key]));
+                    var headerValue = headers[key];
+
+                    if (headerValue != null) {
+                        xhr.setRequestHeader(key, String(headerValue));
+                    }
                 });
 
                 xhr.send(data);
@@ -179,4 +189,4 @@
     } else {
         throw new Error("In order to use XHR you have to include a Promise polyfill");
     }
-})(window, "Content-Type");
+})(window, "Content-Type", "application/json");
