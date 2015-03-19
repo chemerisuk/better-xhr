@@ -163,4 +163,20 @@ describe("better-xhr", function() {
             done();
         });
     });
+
+    it("returns error for invalid JSON reponses", function(done) {
+        XHR.get("url", {json: false}).catch(this.spy);
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+        this.mockXhr.respondWith({
+            "status": 200,
+            "contentType": "application/json",
+            "responseText": "{123:123}"
+        });
+
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+
+            done();
+        });
+    });
 });

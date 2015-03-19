@@ -14,6 +14,10 @@ describe("serialize", function() {
         expect(XHR.serialize(node)).toEqual({});
     });
 
+    it("retuns empty object for invalid elements", function() {
+        expect(XHR.serialize(document.documentElement)).toEqual({});
+    });
+
     describe("form elements", function() {
         test("<form id='f1'><input type='text' name='n1' value='v1'></form>", {n1: "v1"});
         test("<form id='f2'><input type='checkbox' name='n2' value='v2'></form>", {});
