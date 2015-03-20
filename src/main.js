@@ -59,11 +59,11 @@
 
         var xhr = new XMLHttpRequest();
         var promise = new Promise((resolve, reject) => {
-                var handleErrorResponse = () => () => reject(xhr);
+                var handleErrorResponse = (type) => () => { reject(new Error(type)) };
 
-                xhr.onabort = handleErrorResponse();
-                xhr.onerror = handleErrorResponse();
-                xhr.ontimeout = handleErrorResponse();
+                xhr.onabort = handleErrorResponse("abort");
+                xhr.onerror = handleErrorResponse("error");
+                xhr.ontimeout = handleErrorResponse("timeout");
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
@@ -81,7 +81,7 @@
                         if (status >= 200 && status < 300 || status === 304) {
                             resolve(response);
                         } else {
-                            reject(xhr);
+                            reject(response);
                         }
                     }
                 };
@@ -116,18 +116,18 @@
         XHR[method] = (url, config) => XHR(method, url, config);
     });
 
-    XHR.serialize = (elements) => {
+    XHR.serialize = (node) => {
         var result = {};
 
-        if ("form" in elements) {
-            elements = [elements];
-        } else if ("elements" in elements) {
-            elements = elements.elements;
+        if ("form" in node) {
+            node = [node];
+        } else if ("elements" in node) {
+            node = node.elements;
         } else {
-            elements = [];
+            node = [];
         }
 
-        for (let el of elements) {
+        for (let el of node) {
             var name = el.name;
 
             if (el.disabled || !name) continue;

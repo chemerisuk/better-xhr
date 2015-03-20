@@ -1,6 +1,6 @@
 /* globals XHR */
 
-describe("better-xhr", function() {
+describe("XHR", function() {
     "use strict";
 
     beforeEach(function() {
@@ -92,7 +92,7 @@ describe("better-xhr", function() {
         expect(this.mockXhr.requestHeaders).toEqual({"X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json; charset=UTF-8"});
     });
 
-    it("should handle error responses", function(done) {
+    it("handles error responses", function(done) {
         XHR.get("url", {cacheBurst: false}).catch(this.spy);
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.respondWith({
@@ -101,10 +101,8 @@ describe("better-xhr", function() {
             "responseText": "error response"
         });
 
-        this.spy.and.callFake(function(obj) {
-            expect(obj instanceof XMLHttpRequest).toBe(true);
-            expect(obj.responseText).toBe("error response");
-            expect(obj.status).toBe(500);
+        this.spy.and.callFake(function(response) {
+            expect(response).toBe("error response");
 
             done();
         });
@@ -115,8 +113,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.ontimeout();
 
-        this.spy.and.callFake(function(obj) {
-            expect(obj instanceof XMLHttpRequest).toBe(true);
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("timeout");
 
             done();
         });
@@ -127,8 +126,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onabort();
 
-        this.spy.and.callFake(function(obj) {
-            expect(obj instanceof XMLHttpRequest).toBe(true);
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("abort");
 
             done();
         });
@@ -139,8 +139,9 @@ describe("better-xhr", function() {
         this.mockXhr = jasmine.Ajax.requests.mostRecent();
         this.mockXhr.onerror();
 
-        this.spy.and.callFake(function(obj) {
-            expect(obj instanceof XMLHttpRequest).toBe(true);
+        this.spy.and.callFake(function(err) {
+            expect(err instanceof Error).toBe(true);
+            expect(err.message).toBe("error");
 
             done();
         });
