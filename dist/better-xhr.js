@@ -1,16 +1,17 @@
 /**
  * better-xhr: Better abstraction for XMLHttpRequest
- * @version 0.4.1 Thu, 19 Mar 2015 21:50:10 GMT
+ * @version 0.4.2 Fri, 20 Mar 2015 13:19:01 GMT
  * @link https://github.com/chemerisuk/better-xhr
  * @copyright 2015 Maksim Chemerisuk
  * @license MIT
  */
-(function(window, CONTENT_TYPE, MIME_JSON) {
+(function(window, CONTENT_TYPE, MIME_JSON, HTTP_METHODS) {
     "use strict"; /* es6-transpiler has-iterators:false, has-generators: false */
 
     var Promise = window.Promise,
         toString = Object.prototype.toString,
-        isSimpleObject = function(o)  {return toString.call(o) === "[object Object]"};
+        isSimpleObject = function(o)  {return toString.call(o) === "[object Object]"},
+        toQueryString = function(params)  {return params.join("&").replace(/%20/g, "+")};
 
     function XHR(method, url) {var config = arguments[2];if(config === void 0)config = {};
         method = method.toUpperCase();
@@ -19,28 +20,34 @@
             contentType = headers[CONTENT_TYPE],
             charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
-            data = config.data;
+            data = config.data,
+            extrasArgs = [];
 
         if (isSimpleObject(data)) {
-            data = Object.keys(data).reduce(function(memo, key)  {
+            Object.keys(data).forEach(function(key)  {
                 var name = encodeURIComponent(key),
                     value = data[key];
 
                 if (Array.isArray(value)) {
                     value.forEach(function(value)  {
-                        memo.push(name + "=" + encodeURIComponent(value));
+                        extrasArgs.push(name + "=" + encodeURIComponent(value));
                     });
                 } else {
-                    memo.push(name + "=" + encodeURIComponent(value));
+                    extrasArgs.push(name + "=" + encodeURIComponent(value));
                 }
+            });
 
-                return memo;
-            }, []).join("&").replace(/%20/g, "+");
+            if (method === "GET") {
+                data = null;
+            } else {
+                data = toQueryString(extrasArgs);
+                extrasArgs = [];
+            }
         }
 
         if (typeof data === "string") {
             if (method === "GET") {
-                url += (~url.indexOf("?") ? "&" : "?") + data;
+                extrasArgs.push(data);
 
                 data = null;
             } else {
@@ -61,16 +68,28 @@
         }
 
         if (cacheBurst && method === "GET") {
-            url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
+            extrasArgs.push(cacheBurst + "=" + Date.now());
+        }
+
+        if (config.emulateHTTP && HTTP_METHODS.indexOf(method) > 1) {
+            extrasArgs.push(config.emulateHTTP + "=" + method);
+
+            headers["X-Http-Method-Override"] = method;
+
+            method = "POST";
+        }
+
+        if (extrasArgs.length) {
+            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extrasArgs);
         }
 
         var xhr = new XMLHttpRequest();
         var promise = new Promise(function(resolve, reject)  {
-                var handleErrorResponse = function()  {return function()  {return reject(xhr)}};
+                var handleErrorResponse = function(message)  {return function()  { reject(new Error(message)) }};
 
-                xhr.onabort = handleErrorResponse();
-                xhr.onerror = handleErrorResponse();
-                xhr.ontimeout = handleErrorResponse();
+                xhr.onabort = handleErrorResponse("abort");
+                xhr.onerror = handleErrorResponse("error");
+                xhr.ontimeout = handleErrorResponse("timeout");
                 xhr.onreadystatechange = function()  {
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
@@ -88,7 +107,7 @@
                         if (status >= 200 && status < 300 || status === 304) {
                             resolve(response);
                         } else {
-                            reject(xhr);
+                            reject(response);
                         }
                     }
                 };
@@ -119,22 +138,22 @@
     }
 
     // define shortcuts
-    ["get", "post", "put", "delete", "patch"].forEach(function(method)  {
-        XHR[method] = function(url, config)  {return XHR(method, url, config)};
+    HTTP_METHODS.forEach(function(method)  {
+        XHR[method.toLowerCase()] = function(url, config)  {return XHR(method, url, config)};
     });
 
-    XHR.serialize = function(elements)  {var $D$0;var $D$1;var $D$2;var $D$3;var $D$4;
+    XHR.serialize = function(node)  {var $D$0;var $D$1;var $D$2;var $D$3;var $D$4;
         var result = {};
 
-        if ("form" in elements) {
-            elements = [elements];
-        } else if ("elements" in elements) {
-            elements = elements.elements;
+        if ("form" in node) {
+            node = [node];
+        } else if ("elements" in node) {
+            node = node.elements;
         } else {
-            elements = [];
+            node = [];
         }
 
-        $D$0 = 0;$D$1 = elements.length;for (var el ;$D$0 < $D$1;){el = (elements[$D$0++]);
+        $D$0 = 0;$D$1 = node.length;for (var el ;$D$0 < $D$1;){el = (node[$D$0++]);
             var name = el.name;
 
             if (el.disabled || !name) continue;
@@ -189,4 +208,4 @@
     } else {
         throw new Error("In order to use XHR you have to include a Promise polyfill");
     }
-})(window, "Content-Type", "application/json");
+})(window, "Content-Type", "application/json", ["GET", "POST", "PUT", "DELETE", "PATCH"]);
