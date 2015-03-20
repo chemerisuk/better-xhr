@@ -12,7 +12,8 @@
             contentType = headers[CONTENT_TYPE],
             charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
-            data = config.data;
+            data = config.data,
+            extrasArgs = [];
 
         if (isSimpleObject(data)) {
             data = Object.keys(data).reduce((memo, key) => {
@@ -33,7 +34,7 @@
 
         if (typeof data === "string") {
             if (method === "GET") {
-                url += (~url.indexOf("?") ? "&" : "?") + data;
+                extrasArgs.push(data);
 
                 data = null;
             } else {
@@ -54,12 +55,24 @@
         }
 
         if (cacheBurst && method === "GET") {
-            url += (~url.indexOf("?") ? "&" : "?") + cacheBurst + "=" + Date.now();
+            extrasArgs.push(cacheBurst + "=" + Date.now());
+        }
+
+        if (config.emulateHTTP && (method === "PUT" || method === "DELETE" || method === "PATCH")) {
+            extrasArgs.push(config.emulateHTTP + "=" + method);
+
+            headers["X-Http-Method-Override"] = method;
+
+            method = "POST";
+        }
+
+        if (extrasArgs.length) {
+            url += (~url.indexOf("?") ? "&" : "?") + extrasArgs.join("&");
         }
 
         var xhr = new XMLHttpRequest();
         var promise = new Promise((resolve, reject) => {
-                var handleErrorResponse = (type) => () => { reject(new Error(type)) };
+                var handleErrorResponse = (message) => () => { reject(new Error(message)) };
 
                 xhr.onabort = handleErrorResponse("abort");
                 xhr.onerror = handleErrorResponse("error");

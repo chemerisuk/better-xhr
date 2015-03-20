@@ -4,6 +4,7 @@ describe("XHR properties", function() {
     "use strict";
 
     beforeEach(function() {
+        this.randomUrl = String(Date.now());
         this.spy = jasmine.createSpy("callback");
 
         jasmine.Ajax.install();
@@ -62,6 +63,20 @@ describe("XHR properties", function() {
             XHR.post("url", {a: "b"}).then(this.spy);
             this.mockXhr = jasmine.Ajax.requests.mostRecent();
             expect(this.mockXhr.url).toBe("url");
+        });
+    });
+
+    it("can emulate extra HTTP methods", function() {
+        XHR.put(this.randomUrl, {emulateHTTP: "_method"}).then(this.spy);
+
+        this.mockXhr = jasmine.Ajax.requests.mostRecent();
+
+        expect(this.mockXhr.url).toBe(this.randomUrl + "?_method=PUT");
+        expect(this.mockXhr.method).toBe("POST");
+        expect(this.mockXhr.params).toBeUndefined();
+        expect(this.mockXhr.requestHeaders).toEqual({
+            "X-Requested-With": "XMLHttpRequest",
+            "X-Http-Method-Override": "PUT"
         });
     });
 });
