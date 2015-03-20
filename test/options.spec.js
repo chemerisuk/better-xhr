@@ -1,6 +1,6 @@
 /* globals XHR */
 
-describe("XHR properties", function() {
+describe("XHR options", function() {
     "use strict";
 
     beforeEach(function() {

@@ -1,9 +1,10 @@
-(function(window, CONTENT_TYPE, MIME_JSON) {
+(function(window, CONTENT_TYPE, MIME_JSON, HTTP_METHODS) {
     "use strict"; /* es6-transpiler has-iterators:false, has-generators: false */
 
     var Promise = window.Promise,
         toString = Object.prototype.toString,
-        isSimpleObject = (o) => toString.call(o) === "[object Object]";
+        isSimpleObject = (o) => toString.call(o) === "[object Object]",
+        toQueryString = (params) => params.join("&").replace(/%20/g, "+");
 
     function XHR(method, url, config = {}) {
         method = method.toUpperCase();
@@ -16,20 +17,25 @@
             extrasArgs = [];
 
         if (isSimpleObject(data)) {
-            data = Object.keys(data).reduce((memo, key) => {
+            Object.keys(data).forEach((key) => {
                 var name = encodeURIComponent(key),
                     value = data[key];
 
                 if (Array.isArray(value)) {
                     value.forEach((value) => {
-                        memo.push(name + "=" + encodeURIComponent(value));
+                        extrasArgs.push(name + "=" + encodeURIComponent(value));
                     });
                 } else {
-                    memo.push(name + "=" + encodeURIComponent(value));
+                    extrasArgs.push(name + "=" + encodeURIComponent(value));
                 }
+            });
 
-                return memo;
-            }, []).join("&").replace(/%20/g, "+");
+            if (method === "GET") {
+                data = null;
+            } else {
+                data = toQueryString(extrasArgs);
+                extrasArgs = [];
+            }
         }
 
         if (typeof data === "string") {
@@ -58,7 +64,7 @@
             extrasArgs.push(cacheBurst + "=" + Date.now());
         }
 
-        if (config.emulateHTTP && (method === "PUT" || method === "DELETE" || method === "PATCH")) {
+        if (config.emulateHTTP && HTTP_METHODS.indexOf(method) > 1) {
             extrasArgs.push(config.emulateHTTP + "=" + method);
 
             headers["X-Http-Method-Override"] = method;
@@ -67,7 +73,7 @@
         }
 
         if (extrasArgs.length) {
-            url += (~url.indexOf("?") ? "&" : "?") + extrasArgs.join("&");
+            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extrasArgs);
         }
 
         var xhr = new XMLHttpRequest();
@@ -125,8 +131,8 @@
     }
 
     // define shortcuts
-    ["get", "post", "put", "delete", "patch"].forEach((method) => {
-        XHR[method] = (url, config) => XHR(method, url, config);
+    HTTP_METHODS.forEach((method) => {
+        XHR[method.toLowerCase()] = (url, config) => XHR(method, url, config);
     });
 
     XHR.serialize = (node) => {
@@ -195,4 +201,4 @@
     } else {
         throw new Error("In order to use XHR you have to include a Promise polyfill");
     }
-})(window, "Content-Type", "application/json");
+})(window, "Content-Type", "application/json", ["GET", "POST", "PUT", "DELETE", "PATCH"]);
