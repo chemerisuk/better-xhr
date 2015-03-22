@@ -29,6 +29,7 @@ describe("serialize", function() {
         test("<form id='f8'><select name='n8'><option selected>v8</option></select></form>", {n8: "v8"});
         test("<form id='f7'><select name='n9' multiple><option value='v9' selected></option><option value='v99' selected><option value='v999' selected></option></select></form>", {n9: ["v9", "v99", "v999"]});
         test("<form id='f9'><input type='hidden' name='n1' value='v1 v2'><input type='text' value='v2'></form>", {n1: "v1 v2"});
+        testForm("<input type='checkbox' name='n10' value='1' checked><input type='checkbox' name='n10' value='2' checked><input type='checkbox' name='n10' value='3'>", {n10: ["1", "2"]});
     });
 
     describe("ignored form elements", function(){
@@ -58,6 +59,16 @@ describe("serialize", function() {
             sandbox.innerHTML = html;
 
             expect(XHR.serialize(sandbox.firstChild)).toEqual(value);
+        });
+    }
+
+    function testForm(html, value) {
+        it(html, function() {
+            var form = document.createElement("form");
+
+            form.innerHTML = html;
+
+            expect(XHR.serialize(form)).toEqual(value);
         });
     }
 });

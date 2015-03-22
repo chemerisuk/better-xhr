@@ -14,7 +14,7 @@
             charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data,
-            extrasArgs = [];
+            extraArgs = [];
 
         if (isSimpleObject(data)) {
             Object.keys(data).forEach((key) => {
@@ -23,24 +23,24 @@
 
                 if (Array.isArray(value)) {
                     value.forEach((value) => {
-                        extrasArgs.push(name + "=" + encodeURIComponent(value));
+                        extraArgs.push(name + "=" + encodeURIComponent(value));
                     });
                 } else {
-                    extrasArgs.push(name + "=" + encodeURIComponent(value));
+                    extraArgs.push(name + "=" + encodeURIComponent(value));
                 }
             });
 
             if (method === "GET") {
                 data = null;
             } else {
-                data = toQueryString(extrasArgs);
-                extrasArgs = [];
+                data = toQueryString(extraArgs);
+                extraArgs = [];
             }
         }
 
         if (typeof data === "string") {
             if (method === "GET") {
-                extrasArgs.push(data);
+                extraArgs.push(data);
 
                 data = null;
             } else {
@@ -61,19 +61,19 @@
         }
 
         if (cacheBurst && method === "GET") {
-            extrasArgs.push(cacheBurst + "=" + Date.now());
+            extraArgs.push(cacheBurst + "=" + Date.now());
         }
 
         if (config.emulateHTTP && HTTP_METHODS.indexOf(method) > 1) {
-            extrasArgs.push(config.emulateHTTP + "=" + method);
+            extraArgs.push(config.emulateHTTP + "=" + method);
 
             headers["X-Http-Method-Override"] = method;
 
             method = "POST";
         }
 
-        if (extrasArgs.length) {
-            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extrasArgs);
+        if (extraArgs.length) {
+            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extraArgs);
         }
 
         var xhr = new XMLHttpRequest();
@@ -175,8 +175,18 @@
             case "button": // custom button
                 break;
 
-            case "radio": // radio button
             case "checkbox": // checkbox
+                if (el.checked && result[name]) {
+                    if (typeof result[name] === "string") {
+                        result[name] = [ result[name] ];
+                    }
+
+                    result[name].push(el.value);
+
+                    break;
+                }
+                /* falls through */
+            case "radio": // radio button
                 if (!el.checked) break;
                 /* falls through */
             default:
