@@ -4,7 +4,10 @@
     var Promise = window.Promise,
         toString = Object.prototype.toString,
         isSimpleObject = (o) => toString.call(o) === "[object Object]",
-        toQueryString = (params) => params.join("&").replace(/%20/g, "+");
+        toQueryString = (params) => params.join("&").replace(/%20/g, "+"),
+        mimeTypeShortcuts = {
+            json: MIME_JSON
+        };
 
     function XHR(method, url, config = {}) {
         method = method.toUpperCase();
@@ -85,11 +88,16 @@
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
                             response = xhr.responseText,
-                            contentType = xhr.getResponseHeader(CONTENT_TYPE);
+                            // by default parse response depending on Content-Type header
+                            mimeType = config.mimeType || xhr.getResponseHeader(CONTENT_TYPE);
 
-                        if (contentType) {
-                            // parse response depending on Content-Type
-                            if (~contentType.indexOf(MIME_JSON)) {
+                        if (config.mimeType) {
+                            // try to use shortcuts if they exist
+                            mimeType = mimeTypeShortcuts[mimeType] || mimeType;
+                        }
+
+                        if (mimeType) {
+                            if (~mimeType.indexOf(MIME_JSON)) {
                                 try {
                                     response = JSON.parse(response);
                                 } catch (err) {
