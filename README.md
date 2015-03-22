@@ -45,6 +45,7 @@ You can modify `XMLHttpRequest` settings via properties of the `config` object.
 | `timeout` | `Number` | The argument specifies request timeout in miliseconds.<br><br>Default value: `15000`
 | `charset` | `String` | Specifies character encoding.<br><br>Default value: `"UTF-8"`
 | `emulateHTTP` | `String` | Truthy value specifies name of the extra URL parameter to emulate additional HTTP methods for older servers. Also triggers setting of the `X-HTTP-Method-Override` header to the appropriate value before sending an AJAX request.
+| `mimeType` | `String` | Used to specify returned data type and to override value of the `Content-Type` header which is used by default to understand how to parse response.<br><br>Has several shortcuts: `json`, `text`.
 
 ## Method `serialize`
 The plugin introduces static method `XHR.serialize`. This method can be used to collect a form data for AJAX requests. Returned object is a key/value map of form elements. For example

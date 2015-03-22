@@ -7,13 +7,17 @@
         toQueryString = (params) => params.join("&").replace(/%20/g, "+"),
         mimeTypeShortcuts = {
             json: MIME_JSON
-        };
+        },
+        mimeTypeStrategies = {};
+
+    mimeTypeStrategies[MIME_JSON] = (text) => JSON.parse(text);
 
     function XHR(method, url, config = {}) {
         method = method.toUpperCase();
 
         var charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
+            mimeType = "mimeType" in config ? config.mimeType : XHR.defaults.mimeType,
             data = config.data,
             extraArgs = [],
             headers = {};
@@ -94,22 +98,18 @@
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
-                            response = xhr.responseText,
-                            // by default parse response depending on Content-Type header
-                            mimeType = config.mimeType || xhr.getResponseHeader(CONTENT_TYPE);
+                            response = xhr.responseText;
+                        // by default parse response depending on Content-Type header
+                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE);
+                        // skip possible charset suffix
+                        var parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
 
-                        if (config.mimeType) {
-                            // try to use shortcuts if they exist
-                            mimeType = mimeTypeShortcuts[mimeType] || mimeType;
-                        }
-
-                        if (mimeType) {
-                            if (~mimeType.indexOf(MIME_JSON)) {
-                                try {
-                                    response = JSON.parse(response);
-                                } catch (err) {
-                                    return reject(err);
-                                }
+                        if (parseResponse) {
+                            try {
+                                // when strategy found - parse response according to it
+                                response = parseResponse(response);
+                            } catch (err) {
+                                return reject(err);
                             }
                         }
 
@@ -131,6 +131,15 @@
                         xhr.setRequestHeader(key, String(headerValue));
                     }
                 });
+
+                if (mimeType) {
+                    if (mimeType in mimeTypeShortcuts) {
+                        xhr.responseType = mimeType;
+                        mimeType = mimeTypeShortcuts[mimeType];
+                    } else if (xhr.overrideMimeType) {
+                        xhr.overrideMimeType(mimeType);
+                    }
+                }
 
                 xhr.send(data);
             });
