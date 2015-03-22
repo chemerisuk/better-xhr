@@ -12,12 +12,21 @@
     function XHR(method, url, config = {}) {
         method = method.toUpperCase();
 
-        var headers = config.headers || {},
-            contentType = headers[CONTENT_TYPE],
-            charset = "charset" in config ? config.charset : XHR.defaults.charset,
+        var charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
             data = config.data,
-            extraArgs = [];
+            extraArgs = [],
+            headers = {};
+
+        // read default headers first
+        Object.keys(XHR.defaults.headers).forEach((key) => {
+            headers[key] = XHR.defaults.headers[key];
+        });
+
+        // apply request specific headers
+        Object.keys(config.headers || {}).forEach((key) => {
+            headers[key] = config.headers[key];
+        });
 
         if (isSimpleObject(data)) {
             Object.keys(data).forEach((key) => {
@@ -47,20 +56,18 @@
 
                 data = null;
             } else {
-                contentType = contentType || "application/x-www-form-urlencoded";
+                headers[CONTENT_TYPE] = "application/x-www-form-urlencoded";
             }
         }
 
         if (isSimpleObject(config.json)) {
             data = JSON.stringify(config.json);
 
-            contentType = contentType || MIME_JSON;
+            headers[CONTENT_TYPE] = MIME_JSON;
         }
 
-        if (contentType) {
-            if (charset) contentType += "; charset=" + charset;
-
-            headers[CONTENT_TYPE] = contentType;
+        if (CONTENT_TYPE in headers) {
+            headers[CONTENT_TYPE] += "; charset=" + charset;
         }
 
         if (cacheBurst && method === "GET") {
@@ -116,13 +123,7 @@
 
                 xhr.open(method, url, true);
                 xhr.timeout = config.timeout || XHR.defaults.timeout;
-
-                Object.keys(XHR.defaults.headers).forEach((key) => {
-                    if (!(key in headers)) {
-                        headers[key] = XHR.defaults.headers[key];
-                    }
-                });
-
+                // set request headers
                 Object.keys(headers).forEach((key) => {
                     var headerValue = headers[key];
 
