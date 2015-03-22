@@ -66,9 +66,7 @@
 
         if (config.emulateHTTP && HTTP_METHODS.indexOf(method) > 1) {
             extraArgs.push(config.emulateHTTP + "=" + method);
-
             headers["X-Http-Method-Override"] = method;
-
             method = "POST";
         }
 
@@ -88,12 +86,15 @@
                         var status = xhr.status,
                             response = xhr.responseText,
                             contentType = xhr.getResponseHeader(CONTENT_TYPE);
-                        // parse response depending on Content-Type
-                        if (contentType === MIME_JSON) {
-                            try {
-                                response = JSON.parse(response);
-                            } catch (err) {
-                                return reject(err);
+
+                        if (contentType) {
+                            // parse response depending on Content-Type
+                            if (~contentType.indexOf(MIME_JSON)) {
+                                try {
+                                    response = JSON.parse(response);
+                                } catch (err) {
+                                    return reject(err);
+                                }
                             }
                         }
 

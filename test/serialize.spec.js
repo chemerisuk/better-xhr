@@ -19,48 +19,30 @@ describe("serialize", function() {
     });
 
     describe("form elements", function() {
-        test("<form id='f1'><input type='text' name='n1' value='v1'></form>", {n1: "v1"});
-        test("<form id='f2'><input type='checkbox' name='n2' value='v2'></form>", {});
-        test("<form id='f3'><input type='checkbox' name='n3' value='v3' checked></form>", {n3: "v3"});
-        test("<form id='f4'><input type='radio' name='n4' value='v4'></form>", {});
-        test("<form id='f5'><input type='radio' name='n5' value='v5' checked></form>", {n5: "v5"});
-        test("<form id='f6'><select name='n6'><option value='v6'></option><option value='v66' selected></option></select></form>", {n6: "v66"});
-        test("<form id='f7'><select name='n7' multiple><option value='v7' selected></option><option value='v77' selected></option></select></form>", {n7: ["v7", "v77"]});
-        test("<form id='f8'><select name='n8'><option selected>v8</option></select></form>", {n8: "v8"});
-        test("<form id='f7'><select name='n9' multiple><option value='v9' selected></option><option value='v99' selected><option value='v999' selected></option></select></form>", {n9: ["v9", "v99", "v999"]});
-        test("<form id='f9'><input type='hidden' name='n1' value='v1 v2'><input type='text' value='v2'></form>", {n1: "v1 v2"});
+        testForm("<input type='text' name='n1' value='v1'>", {n1: "v1"});
+        testForm("<input type='checkbox' name='n2' value='v2'>", {});
+        testForm("<input type='checkbox' name='n3' value='v3' checked>", {n3: "v3"});
+        testForm("<input type='radio' name='n4' value='v4'>", {});
+        testForm("<input type='radio' name='n5' value='v5' checked>", {n5: "v5"});
+        testForm("<select name='n6'><option value='v6'></option><option value='v66' selected></option></select>", {n6: "v66"});
+        testForm("<select name='n7' multiple><option value='v7' selected></option><option value='v77' selected></option></select>", {n7: ["v7", "v77"]});
+        testForm("<select name='n8'><option selected>v8</option></select>", {n8: "v8"});
+        testForm("<select name='n9' multiple><option value='v9' selected></option><option value='v99' selected><option value='v999' selected></option></select>", {n9: ["v9", "v99", "v999"]});
+        testForm("<input type='hidden' name='n1' value='v1 v2'><input type='text' value='v2'>", {n1: "v1 v2"});
         testForm("<input type='checkbox' name='n10' value='1' checked><input type='checkbox' name='n10' value='2' checked><input type='checkbox' name='n10' value='3'>", {n10: ["1", "2"]});
     });
 
     describe("ignored form elements", function(){
-        test("<form id='f0'><input type='file' name='' value='123'></form>", {});
-        test("<form id='f1'><input type='file' name='t'></form>", {});
-        test("<form id='f2'><input type='submit' name='t'></form>", {});
-        test("<form id='f3'><input type='reset' name='t'></form>",  {});
-        test("<form id='f4'><input type='button' name='t'></form>", {});
-        test("<form id='a5'><button type='submit' name='t'></button></form>", {});
-        test("<form id='f6'><fieldset name='t'></fieldset></form>", {});
+        testForm("<input type='file' name='' value='123'>", {});
+        testForm("<input type='file' name='t'>", {});
+        testForm("<input type='submit' name='t'>", {});
+        testForm("<input type='reset' name='t'>",  {});
+        testForm("<input type='button' name='t'>", {});
+        testForm("<button type='submit' name='t'></button>", {});
+        testForm("<fieldset name='t'></fieldset>", {});
         // test("form>input[type=text name=a value=b]+(fieldset[disabled=disabled]>input[type=text name=c value=d])", {a: "b"});
         // test("form>input[type=text name=a value=b disabled]", {});
     });
-
-    // it("should support passing optional names", function() {
-    //     var form = DOM.mock("form>input[name=one value=1]+input[name=two value=2]");
-
-    //     expect(form.serialize("one")).toEqual({one: "1"});
-    //     expect(form.serialize("two")).toEqual({two: "2"});
-    //     expect(form.serialize()).toEqual({one: "1", two: "2"});
-    // });
-
-    function test(html, value) {
-        it("should serialize " + html, function() {
-            var sandbox = document.createElement("div");
-
-            sandbox.innerHTML = html;
-
-            expect(XHR.serialize(sandbox.firstChild)).toEqual(value);
-        });
-    }
 
     function testForm(html, value) {
         it(html, function() {
