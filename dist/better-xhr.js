@@ -1,6 +1,6 @@
 /**
  * better-xhr: Better abstraction for XMLHttpRequest
- * @version 0.4.2 Fri, 20 Mar 2015 13:19:01 GMT
+ * @version 0.4.3 Mon, 23 Mar 2015 16:22:54 GMT
  * @link https://github.com/chemerisuk/better-xhr
  * @copyright 2015 Maksim Chemerisuk
  * @license MIT
@@ -11,17 +11,33 @@
     var Promise = window.Promise,
         toString = Object.prototype.toString,
         isSimpleObject = function(o)  {return toString.call(o) === "[object Object]"},
-        toQueryString = function(params)  {return params.join("&").replace(/%20/g, "+")};
+        toQueryString = function(params)  {return params.join("&").replace(/%20/g, "+")},
+        mimeTypeShortcuts = {
+            json: MIME_JSON
+        },
+        mimeTypeStrategies = {};
+
+    mimeTypeStrategies[MIME_JSON] = function(text)  {return JSON.parse(text)};
 
     function XHR(method, url) {var config = arguments[2];if(config === void 0)config = {};
         method = method.toUpperCase();
 
-        var headers = config.headers || {},
-            contentType = headers[CONTENT_TYPE],
-            charset = "charset" in config ? config.charset : XHR.defaults.charset,
+        var charset = "charset" in config ? config.charset : XHR.defaults.charset,
             cacheBurst = "cacheBurst" in config ? config.cacheBurst : XHR.defaults.cacheBurst,
+            mimeType = "mimeType" in config ? config.mimeType : XHR.defaults.mimeType,
             data = config.data,
-            extrasArgs = [];
+            extraArgs = [],
+            headers = {};
+
+        // read default headers first
+        Object.keys(XHR.defaults.headers).forEach(function(key)  {
+            headers[key] = XHR.defaults.headers[key];
+        });
+
+        // apply request specific headers
+        Object.keys(config.headers || {}).forEach(function(key)  {
+            headers[key] = config.headers[key];
+        });
 
         if (isSimpleObject(data)) {
             Object.keys(data).forEach(function(key)  {
@@ -30,57 +46,53 @@
 
                 if (Array.isArray(value)) {
                     value.forEach(function(value)  {
-                        extrasArgs.push(name + "=" + encodeURIComponent(value));
+                        extraArgs.push(name + "=" + encodeURIComponent(value));
                     });
                 } else {
-                    extrasArgs.push(name + "=" + encodeURIComponent(value));
+                    extraArgs.push(name + "=" + encodeURIComponent(value));
                 }
             });
 
             if (method === "GET") {
                 data = null;
             } else {
-                data = toQueryString(extrasArgs);
-                extrasArgs = [];
+                data = toQueryString(extraArgs);
+                extraArgs = [];
             }
         }
 
         if (typeof data === "string") {
             if (method === "GET") {
-                extrasArgs.push(data);
+                extraArgs.push(data);
 
                 data = null;
             } else {
-                contentType = contentType || "application/x-www-form-urlencoded";
+                headers[CONTENT_TYPE] = "application/x-www-form-urlencoded";
             }
         }
 
         if (isSimpleObject(config.json)) {
             data = JSON.stringify(config.json);
 
-            contentType = contentType || MIME_JSON;
+            headers[CONTENT_TYPE] = MIME_JSON;
         }
 
-        if (contentType) {
-            if (charset) contentType += "; charset=" + charset;
-
-            headers[CONTENT_TYPE] = contentType;
+        if (CONTENT_TYPE in headers) {
+            headers[CONTENT_TYPE] += "; charset=" + charset;
         }
 
         if (cacheBurst && method === "GET") {
-            extrasArgs.push(cacheBurst + "=" + Date.now());
+            extraArgs.push(cacheBurst + "=" + Date.now());
         }
 
         if (config.emulateHTTP && HTTP_METHODS.indexOf(method) > 1) {
-            extrasArgs.push(config.emulateHTTP + "=" + method);
-
+            extraArgs.push(config.emulateHTTP + "=" + method);
             headers["X-Http-Method-Override"] = method;
-
             method = "POST";
         }
 
-        if (extrasArgs.length) {
-            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extrasArgs);
+        if (extraArgs.length) {
+            url += (~url.indexOf("?") ? "&" : "?") + toQueryString(extraArgs);
         }
 
         var xhr = new XMLHttpRequest();
@@ -93,12 +105,16 @@
                 xhr.onreadystatechange = function()  {
                     if (xhr.readyState === 4) {
                         var status = xhr.status,
-                            response = xhr.responseText,
-                            contentType = xhr.getResponseHeader(CONTENT_TYPE);
-                        // parse response depending on Content-Type
-                        if (contentType === MIME_JSON) {
+                            response = xhr.responseText;
+                        // by default parse response depending on Content-Type header
+                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE);
+                        // skip possible charset suffix
+                        var parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
+
+                        if (parseResponse) {
                             try {
-                                response = JSON.parse(response);
+                                // when strategy found - parse response according to it
+                                response = parseResponse(response);
                             } catch (err) {
                                 return reject(err);
                             }
@@ -114,13 +130,7 @@
 
                 xhr.open(method, url, true);
                 xhr.timeout = config.timeout || XHR.defaults.timeout;
-
-                Object.keys(XHR.defaults.headers).forEach(function(key)  {
-                    if (!(key in headers)) {
-                        headers[key] = XHR.defaults.headers[key];
-                    }
-                });
-
+                // set request headers
                 Object.keys(headers).forEach(function(key)  {
                     var headerValue = headers[key];
 
@@ -128,6 +138,15 @@
                         xhr.setRequestHeader(key, String(headerValue));
                     }
                 });
+
+                if (mimeType) {
+                    if (mimeType in mimeTypeShortcuts) {
+                        xhr.responseType = mimeType;
+                        mimeType = mimeTypeShortcuts[mimeType];
+                    } else if (xhr.overrideMimeType) {
+                        xhr.overrideMimeType(mimeType);
+                    }
+                }
 
                 xhr.send(data);
             });
@@ -182,8 +201,18 @@
             case "button": // custom button
                 break;
 
-            case "radio": // radio button
             case "checkbox": // checkbox
+                if (el.checked && result[name]) {
+                    if (typeof result[name] === "string") {
+                        result[name] = [ result[name] ];
+                    }
+
+                    result[name].push(el.value);
+
+                    break;
+                }
+                /* falls through */
+            case "radio": // radio button
                 if (!el.checked) break;
                 /* falls through */
             default:
