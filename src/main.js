@@ -97,12 +97,13 @@
                 xhr.ontimeout = handleErrorResponse("timeout");
                 xhr.onreadystatechange = () => {
                     if (xhr.readyState === 4) {
-                        var status = xhr.status,
-                            response = xhr.responseText;
                         // by default parse response depending on Content-Type header
-                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE);
-                        // skip possible charset suffix
-                        var parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
+                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE) || "";
+
+                        var status = xhr.status,
+                            response = xhr.responseText,
+                            // skip possible charset suffix
+                            parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
 
                         if (parseResponse) {
                             try {
