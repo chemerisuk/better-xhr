@@ -1,6 +1,6 @@
 /**
  * better-xhr: Better abstraction for XMLHttpRequest
- * @version 0.4.3 Mon, 23 Mar 2015 16:22:54 GMT
+ * @version 0.4.4 Wed, 25 Mar 2015 09:25:20 GMT
  * @link https://github.com/chemerisuk/better-xhr
  * @copyright 2015 Maksim Chemerisuk
  * @license MIT
@@ -104,12 +104,13 @@
                 xhr.ontimeout = handleErrorResponse("timeout");
                 xhr.onreadystatechange = function()  {
                     if (xhr.readyState === 4) {
-                        var status = xhr.status,
-                            response = xhr.responseText;
                         // by default parse response depending on Content-Type header
-                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE);
-                        // skip possible charset suffix
-                        var parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
+                        mimeType = mimeType || xhr.getResponseHeader(CONTENT_TYPE) || "";
+
+                        var status = xhr.status,
+                            response = xhr.responseText,
+                            // skip possible charset suffix
+                            parseResponse = mimeTypeStrategies[mimeType.split(";")[0]];
 
                         if (parseResponse) {
                             try {
